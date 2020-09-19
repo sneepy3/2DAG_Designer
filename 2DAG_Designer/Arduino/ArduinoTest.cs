@@ -7,13 +7,7 @@ using System.Threading.Tasks;
 namespace _2DAG_Designer.Arduino
 {
     public static class ArduinoTest
-
-
-
     {
-
-
-
         public static void MoveX(int turns)
         {
             //Sendet dem Arduino die Bewegung in X Richtung
