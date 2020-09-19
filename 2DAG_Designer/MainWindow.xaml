@@ -1,0 +1,250 @@
+﻿<Window x:Class="_2DAG_Designer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:_2DAG_Designer"
+        mc:Ignorable="d"
+        ResizeMode="CanResize"
+        Title="2DAG Designer" Height="700" Width="1050" MinHeight="650" MinWidth="930" KeyDown="Window_KeyDown" Unloaded="Window_Unloaded" Loaded="Window_Loaded" SizeChanged="Window_SizeChanged">
+
+    <Window.Resources>
+        <Style TargetType="{x:Type Button}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="LightBlue"/>
+                    <Setter Property="BorderBrush" Value="Black" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <StackPanel>
+        
+        <!--Menüleiste-->
+        <DockPanel>
+            <Menu DockPanel.Dock="Top">
+                <MenuItem Header="_Datei">
+                    <MenuItem x:Name="MenuOpenFile" Header="_Öffnen"    Click="MenuOpenFile_Click">
+                        <MenuItem.Icon>
+                            <Image Source="Resources/openfile.png" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem x:Name="MenuSaveFile" Header="_Speichern" Click="MenuSaveFile_Click" InputGestureText="Ctrl+S">
+                        <MenuItem.Icon>
+                            <Image Source="Resources/save.png" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem x:Name="MenuSaveFileTo" Header="_Speichern unter" Click="MenuSaveFileTo_Click">
+                        <MenuItem.Icon>
+                            <Image Source="Resources/save.png" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                </MenuItem>
+
+                <MenuItem Header="_Hilfe">
+                    
+                    <!--öffnen der Dokumentation des Programms-->
+                    <MenuItem Header="_Dokumentation" Click="MenuItem_Click">
+                        <MenuItem.Icon>
+                            <Image Source="Resources/Word.ico" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                </MenuItem>
+            </Menu>
+            <StackPanel></StackPanel>
+        </DockPanel>
+        <!--__________________-->
+        
+        <Grid ShowGridLines="False" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="595" x:Name="DrawColumn" />
+                <ColumnDefinition Width="200" />
+                <ColumnDefinition Width="20" />
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="0.5*" />
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="595" x:Name="DrawRow" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+
+            <!--Grid für die Zeichenfeldlinien-->
+            <Canvas  x:Name="DrawField" Background="LightCyan" Grid.Row="2" Grid.Column="1" >
+            </Canvas>
+
+            <!--Überdeckung für überstehende Objekte-->
+            <Rectangle Grid.Row="0" Grid.Column="0" Fill="White" />
+            <Rectangle Grid.Row="1" Grid.Column="0" Fill="White" />
+            <Rectangle Grid.Row="2" Grid.Column="0" Fill="White" />
+            <Rectangle Grid.Row="3" Grid.Column="0" Fill="White" />
+
+            <Rectangle Grid.Row="0" Grid.Column="1" Fill="White" />
+            <Rectangle Grid.Row="1" Grid.Column="1" Fill="White" />
+            <Rectangle Grid.Row="3" Grid.Column="1" Fill="White" />
+
+            <Rectangle Grid.Row="0" Grid.Column="2" Fill="White" />
+            <Rectangle Grid.Row="1" Grid.Column="2" Fill="White" />
+            <Rectangle Grid.Row="2" Grid.Column="2" Fill="White" />
+            <Rectangle Grid.Row="3" Grid.Column="2" Fill="White" />
+
+            <Rectangle Grid.Row="0" Grid.Column="3" Fill="White" />
+            <Rectangle Grid.Row="1" Grid.Column="3" Fill="White" />
+            <Rectangle Grid.Row="2" Grid.Column="3" Fill="White" />
+            <Rectangle Grid.Row="3" Grid.Column="3" Fill="White" />
+
+
+            <!--Vor und Zurück Buttons-->
+            <Button x:Name="Reverse" Height="40" Width="40" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center" Margin="-40,0,0,0" Click="Reverse_Click" BorderBrush="{x:Null}"  >
+                <Button.Background>
+                    <ImageBrush ImageSource="Resources\reverseButton.png"/>
+                </Button.Background>
+            </Button>
+            <Button x:Name="Redo" Height="40" Width="40" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="40,0,0,0"  Click="Redo_Click" BorderBrush="{x:Null}" >
+                <Button.Background>
+                    <ImageBrush ImageSource="Resources\redoButton.png" TileMode="Tile"/>
+                </Button.Background>
+            </Button>
+            <!---->
+
+            <!--StackPanel für die Steuerung auf der linken Seite-->
+            <StackPanel  Grid.Row="2" HorizontalAlignment="Center" >
+
+                <!--Arduino-->
+                <Border BorderBrush="Black" BorderThickness="1" Margin="0 10" Width="186">
+                    <StackPanel>
+                        <Button x:Name="SearchPortsButton" Content="Ports suchen" Click="SearchPortsButton_Click" Margin="10"/>
+
+                        <Label x:Name="ComLabel" Content="Port auswählen" Visibility="Hidden" />
+
+                        <ComboBox x:Name="AvailablePortsComboBox" Visibility="Hidden" />
+
+                        <Button x:Name="ConnectComButton" Content="Verbinden" Margin="0 10" Width="75" Click="ConnectComButton_Click" Visibility="Hidden" />
+
+                        <Button x:Name="ArduinoTestButton" Content="Bewegung Test" Click="ArduinoTestButton_Click" Margin="10,0" />
+
+                        <Label x:Name="RecievedMessageLabel" Content="Arduino Nachricht" HorizontalAlignment="Center" />
+                    </StackPanel>
+                </Border>
+
+
+                <Button x:Name="Schrittmotor" Content="Schrittmotor" Click="Schrittmotor_Click" Margin="0 50" />
+            </StackPanel>
+
+
+            <!--Zeichenfeld-->
+            <Button x:Name="DrawArea" Grid.Column="1" Grid.Row="2" Click="DrawArea_Click" Opacity="0.2" Background="Transparent">
+            </Button>
+
+
+            <!--Canvas für die cm Bezeichnungen-->
+            <Canvas x:Name="XLabelCanvas"  Grid.Row="1" Grid.Column="1" />
+            <Canvas x:Name="YLabelCanvas" HorizontalAlignment="Right" Width="100" Grid.Row="2" Grid.Column="0" />
+
+
+            <!--StackPanel für die Steuerung auf der rechten Seite-->
+            <StackPanel Grid.Column="2"  Grid.Row="2" HorizontalAlignment="Left" Height="585"  VerticalAlignment="Top" Width="200" Orientation="Vertical">
+
+                <!--Buttons zur Steuerung-->
+                <Border Grid.Row="2" Grid.Column="2" BorderBrush="Black" BorderThickness="1" Margin="10 0">
+                    <StackPanel >
+                        <Button x:Name="DeleteAllButton"    Content="delete ALL"   Margin="0 10"   Height="30" Width="100" Click="DeleteAllButton_Click" BorderBrush="Red" />
+                        <Button x:Name="DeleteButton"       Content="delete Last"  Margin="0 10"   Height="30" Width="100" Click="DeleteButton_Click" />
+                    </StackPanel>
+                </Border>
+
+                <!--gerade/rund Checkboxen-->
+                <Border Grid.Row="2" Grid.Column="2" BorderBrush="Black" BorderThickness="1" Margin="10 10">
+                    <Grid Margin="10 10">
+                        <Grid.ColumnDefinitions >
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <CheckBox x:Name="DrawLineCheck"   Grid.Column="0" Content="gerade"    HorizontalAlignment="Center"      IsChecked="True"   Click="DrawLineCheck_Click" />
+                        <CheckBox x:Name="DrawCircleCheck" Grid.Column="1"  Content="rund"     HorizontalAlignment="Center"                         Click="DrawCircleCheck_Click" />
+                    </Grid>
+                </Border>
+
+                <!--Halbkreis erstellen-->
+                <Border Grid.Row="2" Grid.Column="2" BorderBrush="Black" BorderThickness="1"  Margin="10 0">
+                    <StackPanel>
+                        <Rectangle Margin="0 -10" Width="100" Height="13" Fill="White" Stroke="Black" />
+                        <Label Margin="0 -13" Content="Halbkreis erstellen" HorizontalAlignment="Center" />
+
+
+                        <Label Height="23" Width="120" Content="Höhe"  />
+                        <TextBox x:Name="HeightTextBox" Text=""  Height="23" Width="120" TextWrapping="Wrap"  HorizontalAlignment="Center" VerticalAlignment="Top" />
+
+                        <Label  Height="23" Width="120" Content="Breite" Margin="0,0,0,0" />
+                        <TextBox x:Name="WidthTextBox" Text="" Height="23" Width="120" TextWrapping="Wrap"  HorizontalAlignment="Center" VerticalAlignment="Top"  />
+
+
+                        <Label  Height="23" Width="120" Content="Winkel" Margin="0,0,0,0" />
+                        <TextBox x:Name="AngleTextBox" Text="0" Height="24" Width="120" TextWrapping="Wrap"  HorizontalAlignment="Center" VerticalAlignment="Top"  />
+
+                        <Button x:Name="CreateArcButton" Content="erstellen" Margin="0 5" Width="70" Click="CreateArcButton_Click"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Informationsanzeige-->
+                <Border Grid.Row="2" Grid.Column="2" BorderBrush="Black" BorderThickness="1"  Margin="10 10">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <Label x:Name="WidthLabel"  Grid.Column="0" Content="width" HorizontalAlignment="Left"  VerticalAlignment="Center" Margin="10,0,0,0" />
+                            <Label x:Name="HeightLabel" Grid.Column="1" Content="height" HorizontalAlignment="Left"  VerticalAlignment="Center" Margin="10 0"  />
+                        </StackPanel>
+
+                        <Label x:Name="AngleLabel"  Grid.Row="1" Content="angle" HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="10 0"/>
+
+                    </StackPanel>
+                </Border>
+
+                <!--Wort einfügen-->
+                <Border Grid.Row="2" Grid.Column="2" BorderBrush="Black" BorderThickness="1"  Margin="10 0">
+                    <StackPanel>
+                        <Label Content="Wort einfügen:" HorizontalAlignment="Center" />
+                        <TextBox x:Name="DrawLettersTextBox" Text="" Height="24" Width="120" TextWrapping="Wrap"  HorizontalAlignment="Center" VerticalAlignment="Top" />
+                        <Button x:Name="ApplyTextButton" Grid.Row="1" Content="bestätigen" Width="70" Click="ApplyTextButton_Click" Margin="0 5"/>
+                    </StackPanel>
+                </Border>
+
+                <!--Größe verändern-->
+                <Border Grid.Row="2" Grid.Column="2" BorderBrush="Black" BorderThickness="1"  Margin="10 10">
+                    <Grid Margin="10 0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition  Height="*"/>
+                            <RowDefinition  Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <Label Content="Größe verändern (%):" HorizontalAlignment="Left" Margin="0 0" />
+                        <TextBox x:Name="ChangeSizeTextBox" Text="" Height="24" Width="45" HorizontalAlignment="Right" Margin="-7 3" />
+
+                        <Button x:Name="ApplySizeChangeButton" Grid.Row="1" Content="bestätigen" Width="70" Margin="0 5" Click="ApplySizeChangeButton_Click"/>
+
+                    </Grid>
+                </Border>
+                <!---->
+
+            </StackPanel>
+
+
+            <!--Kreis, der den Fortschritt beim Gravierforgang anzeigt-->
+            <Ellipse x:Name="ProgressCircle" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Top" Width="10" Height="10" Fill="Red" Visibility="Hidden" />
+
+        </Grid>
+
+    </StackPanel>
+</Window>
