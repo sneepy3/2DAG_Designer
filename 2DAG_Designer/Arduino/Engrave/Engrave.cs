@@ -12,10 +12,7 @@ namespace _2DAG_Designer.Arduino.Engrave
 {
 
     public static class Engrave
-    {
-
-
-        
+    {        
         /// <summary>
         /// Graviervorgang wird gestertet
         /// </summary>
