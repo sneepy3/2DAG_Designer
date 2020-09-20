@@ -128,9 +128,9 @@ namespace _2DAG_Designer.Arduino
             //Wartet bis vom Arduino ein OK Befehl kommt
             while (_recievedCommand != "OK")
             {
+                DisplayArduinoMessage();
             }
 
-            DisplayArduinoMessage();
 
             //Befehl wird gelöscht, da er verwendet wurde
             _recievedCommand = String.Empty;
@@ -163,7 +163,6 @@ namespace _2DAG_Designer.Arduino
 
             //Befehl wird abgespeichert
             _recievedCommand = getCommand(data);
-
         }
 
 
@@ -216,7 +215,9 @@ namespace _2DAG_Designer.Arduino
 
             }
             else
-                return "";
+            {      
+                return data;
+            }
         }
 
         #endregion
