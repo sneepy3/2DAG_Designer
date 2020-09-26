@@ -1,0 +1,8 @@
+objectType:Ellipse/endX:3/endY:9/width:4/height:4/color:#FF000000/
+objectType:Line/endX:3/endY:8,5/color:#FF000000/
+objectType:Line/endX:3/endY:8/color:#FF2F4F4F/
+objectType:Line/endX:3/endY:8,5/color:#FF000000/
+objectType:Line/endX:3,6/endY:8/color:#FF2F4F4F/
+objectType:Line/endX:3/endY:8,5/color:#FF000000/
+objectType:Line/endX:3,575/endY:9/color:#FF000000/
+objectType:Line/endX:3,825/endY:9/color:#FF2F4F4F/

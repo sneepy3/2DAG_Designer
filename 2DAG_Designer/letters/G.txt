@@ -1,0 +1,8 @@
+objectType:Ellipse/endX:3/endY:10/width:4/height:4/color:#FF000000/
+objectType:Line/endX:3,625/endY:10/color:#FF2F4F4F/
+objectType:Arc/endX:3,625/endY:9,00000000000001/color:#FF000000/angle:270/width:49,7533333333331/height:31,0958333333333/keepHeight:True/inverted:True/
+objectType:Line/endX:3,625/endY:9,6/color:#FF2F4F4F/
+objectType:Line/endX:3,325/endY:9,6/color:#FF2F4F4F/
+objectType:Line/endX:3,62499999999999/endY:9,6/color:#FF000000/
+objectType:Line/endX:3,62499999999999/endY:10/color:#FF000000/
+objectType:Line/endX:3,87499999999999/endY:10/color:#FF2F4F4F/

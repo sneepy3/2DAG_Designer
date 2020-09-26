@@ -27,17 +27,22 @@ namespace _2DAG_Designer.DrawingObjects.Groups
             //Jeder Buchstabe wird einzeln hinzugefügt
             foreach (var letter in word)
             {
-                string filepath;
+                //Pfad der Buchstaben wird gespeichert
+                string filepath = Environment.CurrentDirectory;
 
-                if(letter == ' ')
+                //Ende weird entfernt (bin\Debug)
+                filepath = filepath.Remove(filepath.Length - 9, 9) + @"letters\";
+
+                //bei einem Leerzeichen
+                if (letter == ' ')
                 {
-                    //Pfad befindet sich im letters ordner
-                    filepath = @"letters\_.txt";
+                    //Datei wird dem Pfad hinzugefügt
+                    filepath += "_.txt";
                 }
                 else
                 {
                     //Pfad befindet sich im letters ordner
-                    filepath = @"letters\" + letter + ".txt";
+                    filepath += letter + ".txt";
                 }
 
                 //Objekte des Buchstabens werden der Liste hinzugefügt
