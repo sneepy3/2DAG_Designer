@@ -50,13 +50,18 @@ namespace _2DAG_Designer.Arduino.Engrave
         private static string GetLineInformation(this IDrawable drawable)
         {
             //Distanz Start-Ende in X Richtung
-            var xDistance = Math.Round(MainWindow.PixelToCentimeter(drawable.Width));
+            var xDistance = Math.Round(MainWindow.PixelToCentimeter(drawable.Width), 5);
 
             //Distanz Start-Ende in Y Richtung
-            var yDistance = Math.Round(MainWindow.PixelToCentimeter(drawable.Height));
+            var yDistance = Math.Round(MainWindow.PixelToCentimeter(drawable.Height), 5);
+
+
+            var returnString = $"#OBJ{xDistance}/{yDistance}";
+
+            returnString = returnString.Replace(",", ".");
 
             //Information wird zurückgegeben
-            return $"#OBJ{xDistance}/{yDistance}";
+            return returnString;
         }
     }
 }

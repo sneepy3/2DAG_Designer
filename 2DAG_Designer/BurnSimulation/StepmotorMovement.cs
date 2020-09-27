@@ -155,7 +155,7 @@ namespace _2DAG_Designer.BurnSimulation
 
 
                 //Wenn das Objekt existiert
-                if(!(lines.Length - 1 < currentObj))
+                if((lines.Length - 1 >= currentObj))
                 {
                     //Position werden festgelegt
                     Position.Margin = new Thickness(lines[currentObj].GetStart().X - 5, lines[currentObj].GetStart().Y - 5, 0, 0);
