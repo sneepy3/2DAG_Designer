@@ -32,23 +32,13 @@ namespace _2DAG_Designer.Arduino
         /// <summary>
         /// fügt verfügbare Ports zur Auswahl hinzu
         /// </summary>
-        public static void GetPorts()
+        public static string[] GetPorts()
         {
             //UI sichtbar
             enableUI();
 
-            //verfügbare Ports werden abgerufen
-            var availablePorts = SerialPort.GetPortNames();
-
-            //Wenn kein Port existiert, wird der Vorgang beendet
-            if (availablePorts[0] == null)
-                return;
-
-            //Jeder Port wird der Combobox hinzugefügt
-            foreach (var port in availablePorts)
-            {
-                MainWindow.ThisWindow.AvailablePortsComboBox.Items.Add(port);
-            }
+            //verfügbare Ports werden zurückgegeben
+            return SerialPort.GetPortNames();
         }
 
 
@@ -126,22 +116,11 @@ namespace _2DAG_Designer.Arduino
         public static void WaitForArduinoResponse()
         {
             //Wartet bis vom Arduino ein OK Befehl kommt
-            while (_recievedCommand != "OK")
-            {
-                DisplayArduinoMessage();
-            }
-
+            while (_recievedCommand != "OK") { }
 
             //Befehl wird gelöscht, da er verwendet wurde
             _recievedCommand = String.Empty;
         }
-
-        public static void DisplayArduinoMessage()
-        {
-            //Nachricht wird auf dem Fenster angezeigt
-            MainWindow.ThisWindow.RecievedMessageLabel.Content = _recievedCommand;
-        }
-
 
         public static void ConnectButtonClicked()
         {
