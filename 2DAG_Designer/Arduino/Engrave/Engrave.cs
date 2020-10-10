@@ -12,7 +12,14 @@ namespace _2DAG_Designer.Arduino.Engrave
 {
 
     public static class Engrave
-    {        
+    {
+        private static int _progress = 0;
+
+        public static int Progress
+        {
+            get { return _progress; }
+        }
+
         /// <summary>
         /// Graviervorgang wird gestertet
         /// </summary>
@@ -62,6 +69,12 @@ namespace _2DAG_Designer.Arduino.Engrave
 
             //Information wird zurückgegeben
             return returnString;
+        }
+
+
+        public static void ProgressMessageRecieved(int progress)
+        {
+            _progress = progress;
         }
     }
 }

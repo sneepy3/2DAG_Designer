@@ -138,10 +138,11 @@ namespace _2DAG_Designer.Arduino
         /// </summary>
         private static void dataRecieved(object sender, SerialDataReceivedEventArgs e)
         {
+            //Eingegangene Nachricht wird gespeichert
             var data = _serialPort.ReadLine();
 
-            //Befehl wird abgespeichert
-            _recievedCommand = getCommand(data);
+            //Eingegangene Nachricht wird behandelt
+            handleIncomingMessage(data);
         }
 
 
@@ -181,7 +182,7 @@ namespace _2DAG_Designer.Arduino
         /// <summary>
         /// gibt den Befehl einer Arduino Nachricht zurück
         /// </summary>
-        private static string getCommand(string data)
+        private static void handleIncomingMessage(string data)
         {
             //Wenn die Nachricht mit ! beginnt
             if (data[0] == '!')
@@ -190,12 +191,18 @@ namespace _2DAG_Designer.Arduino
                 data = data.Remove(data.Length - 1, 1);
 
                 //! wird entfernt
-                return data.Remove(0, 1);
+                _recievedCommand = data.Remove(0, 1);
 
             }
             else
             {      
-                return data;
+                if(data.StartsWith("PROG"))
+                {
+                    Engrave.Engrave.ProgressMessageRecieved(int.Parse(data.Substring(4)));
+                }
+
+
+                _recievedCommand =  data;
             }
         }
 
