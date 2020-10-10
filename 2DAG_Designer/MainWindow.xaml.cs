@@ -387,16 +387,43 @@ namespace _2DAG_Designer
 
         private void ConnectComButton_Click(object sender, RoutedEventArgs e)
         {
+            //ConnectButton wurde gedrückt
             Arduino.Communication.ConnectButtonClicked();
+
+            //Wenn eine Verbindung existiert
+            if(Communication.IsConnected)
+            {
+                //UploadButton wird sichtbar
+                ArduinoUploadButton.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                //UploadButton wird unsichtbar
+                ArduinoUploadButton.Visibility = Visibility.Hidden;
+            }
         }
 
         private void SearchPortsButton_Click(object sender, RoutedEventArgs e)
         {
             //Ports werden gesucht
-            Arduino.Communication.GetPorts();
+            var ports = Arduino.Communication.GetPorts();
+
+            //bisherige Ports werden entfernt
+            AvailablePortsComboBox.Items.Clear();
+
+            //Wenn kein Port gefunden wurde
+            if (ports[0] == null)
+                AvailablePortsComboBox.Items.Add("kein Port gefunden");
+
+            //alle zurückgegebenen ports werden hinzugefügt
+            foreach (var port  in ports)
+            {
+                //Port wird hinzugefügt
+                AvailablePortsComboBox.Items.Add(port);
+            }
         }
 
-        private void ArduinoTestButton_Click(object sender, RoutedEventArgs e)
+        private void ArduinoUploadButton_Click(object sender, RoutedEventArgs e)
         {
             //Wenn eine Verbindung zum Arduino besteht
             if(Communication.IsConnected)
