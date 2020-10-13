@@ -180,7 +180,7 @@ namespace _2DAG_Designer.Arduino
         }
 
         /// <summary>
-        /// gibt den Befehl einer Arduino Nachricht zurück
+        /// Behandelt eingehende Arduino Nachrichten
         /// </summary>
         private static void handleIncomingMessage(string data)
         {

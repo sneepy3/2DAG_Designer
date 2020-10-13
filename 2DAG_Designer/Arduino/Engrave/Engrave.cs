@@ -2,9 +2,11 @@
 using _2DAG_Designer.DrawingObjects.Objects;
 using System;
 using System.Collections.Generic;
+using System.IO.Pipes;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Media.Animation;
 using static _2DAG_Designer.Arduino.Communication;
 
@@ -71,10 +73,17 @@ namespace _2DAG_Designer.Arduino.Engrave
             return returnString;
         }
 
-
+        /// <summary>
+        /// wird aufgerufen, wenn der Arduino eine Information über den Fortschritt gibt
+        /// </summary>
+        /// <param name="progress">Fortschritt in %</param>
         public static void ProgressMessageRecieved(int progress)
         {
+            //Fortschritt wird abgespeichert
             _progress = progress;
+
+            //Fortschrittssleiste wird aktualisiert
+            MainWindow.ThisWindow.BurnProgressBar.Value = progress;
         }
     }
 }
