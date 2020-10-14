@@ -84,6 +84,14 @@ namespace _2DAG_Designer.Arduino.Engrave
 
             //Fortschrittssleiste wird aktualisiert
             MainWindow.ThisWindow.BurnProgressBar.Value = progress;
+
+            //ist der Prozess fertig,
+            if(progress == 100)
+                //Wird die ProgressBar unsichtbar
+                MainWindow.ThisWindow.BurnProgressBar.Visibility = Visibility.Collapsed;
+            else
+                //sonst sichtbar
+                MainWindow.ThisWindow.BurnProgressBar.Visibility = Visibility.Visible;
         }
     }
 }

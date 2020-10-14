@@ -394,12 +394,12 @@ namespace _2DAG_Designer
             if(Communication.IsConnected)
             {
                 //UploadButton wird sichtbar
-                ArduinoUploadButton.Visibility = Visibility.Visible;
+                ArduinoUploadButton.IsEnabled = true;
             }
             else
             {
                 //UploadButton wird unsichtbar
-                ArduinoUploadButton.Visibility = Visibility.Hidden;
+                ArduinoUploadButton.IsEnabled = false;
             }
         }
 

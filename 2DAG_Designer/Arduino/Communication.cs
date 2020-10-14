@@ -154,13 +154,13 @@ namespace _2DAG_Designer.Arduino
         private static void enableUI()
         {
             //Label
-            MainWindow.ThisWindow.ComLabel.Visibility = System.Windows.Visibility.Visible;
+            MainWindow.ThisWindow.ComLabel.IsEnabled = true;
 
             //Combobox
-            MainWindow.ThisWindow.AvailablePortsComboBox.Visibility = System.Windows.Visibility.Visible;
+            MainWindow.ThisWindow.AvailablePortsComboBox.IsEnabled = true;
 
             //Connect Button
-            MainWindow.ThisWindow.ConnectComButton.Visibility = System.Windows.Visibility.Visible;
+            MainWindow.ThisWindow.ConnectComButton.IsEnabled = true;
             MainWindow.ThisWindow.ConnectComButton.Content = "verbinden";
         }
 
@@ -170,13 +170,13 @@ namespace _2DAG_Designer.Arduino
         private static void disableUI()
         {
             //Label
-            MainWindow.ThisWindow.ComLabel.Visibility = System.Windows.Visibility.Hidden;
-            
+            MainWindow.ThisWindow.ComLabel.IsEnabled = false;
+
             //Combobox
-            MainWindow.ThisWindow.AvailablePortsComboBox.Visibility = System.Windows.Visibility.Hidden;
+            MainWindow.ThisWindow.AvailablePortsComboBox.IsEnabled = false;
 
             //Connect Button
-            MainWindow.ThisWindow.ConnectComButton.Visibility = System.Windows.Visibility.Hidden;
+            MainWindow.ThisWindow.ConnectComButton.IsEnabled = false;
         }
 
         /// <summary>
