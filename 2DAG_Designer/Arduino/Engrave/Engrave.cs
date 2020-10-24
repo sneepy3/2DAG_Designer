@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media.Animation;
+using System.Windows.Threading;
 using static _2DAG_Designer.Arduino.Communication;
 
 namespace _2DAG_Designer.Arduino.Engrave
@@ -21,6 +22,9 @@ namespace _2DAG_Designer.Arduino.Engrave
         {
             get { return _progress; }
         }
+
+        //wird true, wenn sich der Fortschritt ändert
+        private static bool progressChanged = true;
 
         /// <summary>
         /// Graviervorgang wird gestertet
@@ -51,6 +55,22 @@ namespace _2DAG_Designer.Arduino.Engrave
                     //Andere Objektarten noch nich implementiert
                 }
             }
+
+            //Behandlung für die Änderung der Fortschrittsanzeige
+            HandleProgressChanges();
+        }
+
+        /// <summary>
+        /// wird aufgerufen, wenn der Arduino eine Information über den Fortschritt gibt
+        /// </summary>
+        /// <param name="progress">Fortschritt in %</param>
+        public static void ProgressMessageRecieved(int progress)
+        {
+            //Fortschritt wird abgespeichert
+            _progress = progress;
+
+            //Fortschritt wurde geändert
+            progressChanged = true;
         }
 
         /// <summary>
@@ -74,24 +94,45 @@ namespace _2DAG_Designer.Arduino.Engrave
         }
 
         /// <summary>
-        /// wird aufgerufen, wenn der Arduino eine Information über den Fortschritt gibt
+        /// überprüft ständig, ob sich der Fortschritt ändert
+        /// Änderung in der Fortschrittsanzeige müssen hier vorgenommen werde, da
+        /// der ProgressMessageRecieved Handler keinen Zugriff auf den UI-Thread hat
         /// </summary>
-        /// <param name="progress">Fortschritt in %</param>
-        public static void ProgressMessageRecieved(int progress)
+        private static void HandleProgressChanges()
         {
-            //Fortschritt wird abgespeichert
-            _progress = progress;
+            var timer = new DispatcherTimer();
+            
+            //Timer Interval
+            timer.Interval = new TimeSpan(0, 0, 0, 1);
 
-            //Fortschrittssleiste wird aktualisiert
-            MainWindow.ThisWindow.BurnProgressBar.Value = progress;
+            //Timer Tick event
+            timer.Tick += new EventHandler(delegate (object sender, EventArgs e)
+            {
+                //Wenn sich der Fortschritt verändert hat
+                if (progressChanged)
+                {
+                    progressChanged = false;
 
-            //ist der Prozess fertig,
-            if(progress == 100)
-                //Wird die ProgressBar unsichtbar
-                MainWindow.ThisWindow.BurnProgressBar.Visibility = Visibility.Collapsed;
-            else
-                //sonst sichtbar
-                MainWindow.ThisWindow.BurnProgressBar.Visibility = Visibility.Visible;
+                    //Fortschrittssleiste wird aktualisiert
+                    MainWindow.ThisWindow.BurnProgressBar.Value = Progress;
+
+                    //ist der Prozess fertig,
+                    if (Progress == 100)
+                        //Wird die ProgressBar unsichtbar
+                        MainWindow.ThisWindow.BurnProgressBar.Visibility = Visibility.Collapsed;
+                    else
+                        //sonst sichtbar
+                        MainWindow.ThisWindow.BurnProgressBar.Visibility = Visibility.Visible;
+                }
+            });
+
+            //Timer wird gestartet
+            timer.Start();
+        }
+        
+        private static void timerTick(object sender, EventArgs e)
+        {
+          
         }
     }
 }
