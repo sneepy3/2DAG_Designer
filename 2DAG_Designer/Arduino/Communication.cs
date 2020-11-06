@@ -89,8 +89,7 @@ namespace _2DAG_Designer.Arduino
                 //UI unsictbar
                 disableUI();
 
-                //disconnect an Arduino
-                _serialPort.Write("!DCONN\n");
+                //Verbindung wird geschlossen
                 _serialPort.Close();
 
                 MainWindow.ThisWindow.ConnectComButton.Content = "Verbinden";
@@ -138,10 +137,11 @@ namespace _2DAG_Designer.Arduino
         /// </summary>
         private static void dataRecieved(object sender, SerialDataReceivedEventArgs e)
         {
+            //Eingegangene Nachricht wird gespeichert
             var data = _serialPort.ReadLine();
 
-            //Befehl wird abgespeichert
-            _recievedCommand = getCommand(data);
+            //Eingegangene Nachricht wird behandelt
+            handleIncomingMessage(data);
         }
 
 
@@ -153,13 +153,13 @@ namespace _2DAG_Designer.Arduino
         private static void enableUI()
         {
             //Label
-            MainWindow.ThisWindow.ComLabel.Visibility = System.Windows.Visibility.Visible;
+            MainWindow.ThisWindow.ComLabel.IsEnabled = true;
 
             //Combobox
-            MainWindow.ThisWindow.AvailablePortsComboBox.Visibility = System.Windows.Visibility.Visible;
+            MainWindow.ThisWindow.AvailablePortsComboBox.IsEnabled = true;
 
             //Connect Button
-            MainWindow.ThisWindow.ConnectComButton.Visibility = System.Windows.Visibility.Visible;
+            MainWindow.ThisWindow.ConnectComButton.IsEnabled = true;
             MainWindow.ThisWindow.ConnectComButton.Content = "verbinden";
         }
 
@@ -169,19 +169,19 @@ namespace _2DAG_Designer.Arduino
         private static void disableUI()
         {
             //Label
-            MainWindow.ThisWindow.ComLabel.Visibility = System.Windows.Visibility.Hidden;
-            
+            MainWindow.ThisWindow.ComLabel.IsEnabled = false;
+
             //Combobox
-            MainWindow.ThisWindow.AvailablePortsComboBox.Visibility = System.Windows.Visibility.Hidden;
+            MainWindow.ThisWindow.AvailablePortsComboBox.IsEnabled = false;
 
             //Connect Button
-            MainWindow.ThisWindow.ConnectComButton.Visibility = System.Windows.Visibility.Hidden;
+            MainWindow.ThisWindow.ConnectComButton.IsEnabled = false;
         }
 
         /// <summary>
-        /// gibt den Befehl einer Arduino Nachricht zurück
+        /// Behandelt eingehende Arduino Nachrichten
         /// </summary>
-        private static string getCommand(string data)
+        private static void handleIncomingMessage(string data)
         {
             //Wenn die Nachricht mit ! beginnt
             if (data[0] == '!')
@@ -190,12 +190,18 @@ namespace _2DAG_Designer.Arduino
                 data = data.Remove(data.Length - 1, 1);
 
                 //! wird entfernt
-                return data.Remove(0, 1);
+                _recievedCommand = data.Remove(0, 1);
 
             }
             else
             {      
-                return data;
+                if(data.StartsWith("PROG"))
+                {
+                    Engrave.Engrave.ProgressMessageRecieved(int.Parse(data.Substring(4)));
+                }
+
+
+                _recievedCommand =  data;
             }
         }
 

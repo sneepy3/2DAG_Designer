@@ -9,27 +9,145 @@
         Title="2DAG Designer" Height="700" Width="1050" MinHeight="650" MinWidth="930" KeyDown="Window_KeyDown" Unloaded="Window_Unloaded" Loaded="Window_Loaded" SizeChanged="Window_SizeChanged">
 
     <Window.Resources>
-        <Style TargetType="{x:Type Button}">
+        <Style TargetType="{x:Type Control}" x:Key="fontStyle">
+            <Setter Property="FontFamily" Value="Helvetica" />
+        </Style>
+
+        <Style x:Key="FocusVisual">
+            <Setter Property="Control.Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Rectangle Margin="2" SnapsToDevicePixels="true" Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" StrokeThickness="1" StrokeDashArray="1 2"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="{x:Type Label}" BasedOn="{StaticResource fontStyle}" >
+
+        </Style>
+
+        <SolidColorBrush x:Key="Button.Disabled.Background" Color="#FFF4F4F4"/>
+        <SolidColorBrush x:Key="Button.Disabled.Border" Color="#FFADB2B5"/>
+        <SolidColorBrush x:Key="Button.Disabled.Foreground" Color="#FF838383"/>
+        <Style TargetType="{x:Type Button}" BasedOn="{StaticResource fontStyle}">
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
+            <Setter Property="Background" Value="#64A6A8"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="1"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type Button}">
-                        <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <Border x:Name="border" CornerRadius="5" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="true">
+                            <ContentPresenter x:Name="contentPresenter" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
                         </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsDefaulted" Value="true">
+                                <Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter Property="Background" TargetName="border" Value="#64A6A8"/>
+                                <Setter Property="BorderBrush" TargetName="border" Value="#64A6A8"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="true">
+                                <Setter Property="Background" TargetName="border" Value="#4C8B8C"/>
+                                <Setter Property="BorderBrush" TargetName="border" Value="#4C8B8C"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Background" TargetName="border" Value="{StaticResource Button.Disabled.Background}"/>
+                                <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource Button.Disabled.Border}"/>
+                                <Setter Property="TextElement.Foreground" TargetName="contentPresenter" Value="{StaticResource Button.Disabled.Foreground}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="DrawAreaStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource fontStyle}">
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
+            <Setter Property="Background" Value="#C0F0F0"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="1"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="border" CornerRadius="5" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="true">
+                            <ContentPresenter x:Name="contentPresenter" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="true" />
+
+                            <Trigger Property="IsPressed" Value="true" />
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <SolidColorBrush x:Key="TextBox.Static.Border" Color="#FFABAdB3"/>
+        <SolidColorBrush x:Key="TextBox.MouseOver.Border" Color="#FF7EB4EA"/>
+        <SolidColorBrush x:Key="TextBox.Focus.Border" Color="#FF569DE5"/>
+        <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource fontStyle}">
+            <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource TextBox.Static.Border}"/>
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+            <Setter Property="KeyboardNavigation.TabNavigation" Value="None"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="AllowDrop" Value="true"/>
+            <Setter Property="ScrollViewer.PanningMode" Value="VerticalFirst"/>
+            <Setter Property="Stylus.IsFlicksEnabled" Value="False"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type TextBox}">
+                        <Border x:Name="border" CornerRadius="5" BorderBrush="#BED7D7" BorderThickness="3" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
+                            <ScrollViewer x:Name="PART_ContentHost" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Opacity" TargetName="border" Value="0.56"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter Property="BorderBrush" TargetName="border" Value="#9FD2D3 "/>
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="true">
+                                <Setter Property="BorderBrush" TargetName="border" Value="#64A6A8"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
             <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="LightBlue"/>
-                    <Setter Property="BorderBrush" Value="Black" />
-                </Trigger>
+                <MultiTrigger>
+                    <MultiTrigger.Conditions>
+                        <Condition Property="IsInactiveSelectionHighlightEnabled" Value="true"/>
+                        <Condition Property="IsSelectionActive" Value="false"/>
+                    </MultiTrigger.Conditions>
+                    <Setter Property="SelectionBrush" Value="{DynamicResource {x:Static SystemColors.InactiveSelectionHighlightBrushKey}}"/>
+                </MultiTrigger>
             </Style.Triggers>
         </Style>
+
+        <Style TargetType="{x:Type Border}">
+            <Setter Property="CornerRadius" Value="5" />
+            <Setter Property="Background" Value="#DBE5E5" />
+            <Setter Property="BorderBrush" Value="#BED7D7" />
+            <Setter Property="BorderThickness" Value="3" />
+        </Style>
+
     </Window.Resources>
 
     <StackPanel>
-        
+
         <!--Menüleiste-->
         <DockPanel>
             <Menu DockPanel.Dock="Top">
@@ -52,7 +170,7 @@
                 </MenuItem>
 
                 <MenuItem Header="_Hilfe">
-                    
+
                     <!--öffnen der Dokumentation des Programms-->
                     <MenuItem Header="_Dokumentation" Click="MenuItem_Click">
                         <MenuItem.Icon>
@@ -64,7 +182,7 @@
             <StackPanel></StackPanel>
         </DockPanel>
         <!--__________________-->
-        
+
         <Grid ShowGridLines="False" >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*" />
@@ -121,31 +239,38 @@
 
             <!--StackPanel für die Steuerung auf der linken Seite-->
             <StackPanel  Grid.Row="2" HorizontalAlignment="Center" >
-
                 <!--Arduino-->
-                <Border BorderBrush="Black" BorderThickness="1" Margin="0 10" Width="186">
+                <Border 
+                    Margin="0 10"
+                    Width="186">
+
                     <StackPanel>
-                        <Button x:Name="SearchPortsButton" Content="Ports suchen" Click="SearchPortsButton_Click" Margin="10"/>
+                        <Button x:Name="SearchPortsButton" Content="Ports suchen" Click="SearchPortsButton_Click" Margin="10" />
+                        <Label x:Name="ComLabel" Content="Port auswählen" IsEnabled="False" Visibility="Visible" />
 
-                        <Label x:Name="ComLabel" Content="Port auswählen" Visibility="Hidden" />
+                        <ComboBox x:Name="AvailablePortsComboBox" IsEnabled="False" Visibility="Visible" Margin="10,0" />
 
-                        <ComboBox x:Name="AvailablePortsComboBox" Visibility="Hidden" />
+                        <Button x:Name="ConnectComButton" Content="Verbinden" Margin="0 10" Width="75" Click="ConnectComButton_Click" IsEnabled="False" Visibility="Visible" />
 
-                        <Button x:Name="ConnectComButton" Content="Verbinden" Margin="0 10" Width="75" Click="ConnectComButton_Click" Visibility="Hidden" />
+                        <Button x:Name="ArduinoUploadButton" Content="Hochladen" Click="ArduinoUploadButton_Click" Margin="10,5" IsEnabled="False" Visibility="Visible" />
 
-                        <Button x:Name="ArduinoUploadButton" Content="Hochladen" Click="ArduinoUploadButton_Click" Margin="10,0" Visibility="Hidden" />
+                        <Button x:Name="StartButton" Content="Starten" Margin="10 5" IsEnabled="False" Click="StartButton_Click"/>
+
+                        <ProgressBar x:Name="BurnProgressBar" Visibility="Collapsed" Value="50" Height="12" Margin="10 5" />
                     </StackPanel>
                 </Border>
 
 
-                <Button x:Name="Schrittmotor" Content="Schrittmotor" Click="Schrittmotor_Click" Margin="0 50" />
+                <Button x:Name="Schrittmotor" Visibility="Hidden" Content="Schrittmotor" Click="Schrittmotor_Click" Margin="0 50" />
             </StackPanel>
 
 
             <!--Zeichenfeld-->
-            <Button x:Name="DrawArea" Grid.Column="1" Grid.Row="2" Click="DrawArea_Click" Opacity="0.2" Background="Transparent">
-            </Button>
-
+            <Button x:Name="DrawArea"  
+                    Grid.Column="1" Grid.Row="2" 
+                    Click="DrawArea_Click"  
+                    Style="{StaticResource DrawAreaStyle}"
+                    Opacity="0.2"/>
 
             <!--Canvas für die cm Bezeichnungen-->
             <Canvas x:Name="XLabelCanvas"  Grid.Row="1" Grid.Column="1" />
@@ -156,15 +281,13 @@
             <StackPanel Grid.Column="2"  Grid.Row="2" HorizontalAlignment="Left" Height="585"  VerticalAlignment="Top" Width="200" Orientation="Vertical">
 
                 <!--Buttons zur Steuerung-->
-                <Border Grid.Row="2" Grid.Column="2" BorderBrush="Black" BorderThickness="1" Margin="10 0">
+                <Border Grid.Row="2" Grid.Column="2"   Margin="10 0">
                     <StackPanel >
-                        <Button x:Name="DeleteAllButton"    Content="delete ALL"   Margin="0 10"   Height="30" Width="100" Click="DeleteAllButton_Click" BorderBrush="Red" />
+                        <Button x:Name="DeleteAllButton" ToolTip="alles Löschen"    Content="delete ALL"   Margin="0 10"   Height="30" Width="100" Click="DeleteAllButton_Click"  />
                         <Button x:Name="DeleteButton"       Content="delete Last"  Margin="0 10"   Height="30" Width="100" Click="DeleteButton_Click" />
                     </StackPanel>
                 </Border>
-
-                <!--gerade/rund Checkboxen-->
-                <Border Grid.Row="2" Grid.Column="2" BorderBrush="Black" BorderThickness="1" Margin="10 10">
+                <Border   Margin="10 5">
                     <Grid Margin="10 10">
                         <Grid.ColumnDefinitions >
                             <ColumnDefinition Width="*" />
@@ -176,11 +299,16 @@
                     </Grid>
                 </Border>
 
+                <!--gerade/rund Checkboxen-->
+
                 <!--Halbkreis erstellen-->
-                <Border Grid.Row="2" Grid.Column="2" BorderBrush="Black" BorderThickness="1"  Margin="10 0">
+                <Border Grid.Row="2" Grid.Column="2"   Margin="10 0" >
                     <StackPanel>
-                        <Rectangle Margin="0 -10" Width="100" Height="13" Fill="White" Stroke="Black" />
-                        <Label Margin="0 -13" Content="Halbkreis erstellen" HorizontalAlignment="Center" />
+
+
+                        <Border Margin="27, -3" Height="22">
+                            <TextBlock FontFamily="Helvetica" Text="Halbkreis erstellen" TextAlignment="Center" HorizontalAlignment="Center" Width="120"  />
+                        </Border>
 
 
                         <Label Height="23" Width="120" Content="Höhe"  />
@@ -198,7 +326,7 @@
                 </Border>
 
                 <!-- Informationsanzeige-->
-                <Border Grid.Row="2" Grid.Column="2" BorderBrush="Black" BorderThickness="1"  Margin="10 10">
+                <Border Grid.Row="2" Grid.Column="2"   Margin="10 5">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <Label x:Name="WidthLabel"  Grid.Column="0" Content="width" HorizontalAlignment="Left"  VerticalAlignment="Center" Margin="10,0,0,0" />
@@ -211,7 +339,7 @@
                 </Border>
 
                 <!--Wort einfügen-->
-                <Border Grid.Row="2" Grid.Column="2" BorderBrush="Black" BorderThickness="1"  Margin="10 0">
+                <Border Grid.Row="2" Grid.Column="2"   Margin="10 0">
                     <StackPanel>
                         <Label Content="Wort einfügen:" HorizontalAlignment="Center" />
                         <TextBox x:Name="DrawLettersTextBox" Text="" Height="24" Width="120" TextWrapping="Wrap"  HorizontalAlignment="Center" VerticalAlignment="Top" />
@@ -220,7 +348,7 @@
                 </Border>
 
                 <!--Größe verändern-->
-                <Border Grid.Row="2" Grid.Column="2" BorderBrush="Black" BorderThickness="1"  Margin="10 10">
+                <Border Grid.Row="2" Grid.Column="2" Margin="10 5">
                     <Grid Margin="10 0">
                         <Grid.RowDefinitions>
                             <RowDefinition  Height="*"/>
