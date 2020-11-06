@@ -115,7 +115,7 @@ namespace _2DAG_Designer.Arduino
         public static void WaitForArduinoResponse()
         {
             //Wartet bis vom Arduino ein OK Befehl kommt
-            //while (_recievedCommand != "OK") { }
+            while (_recievedCommand != "OK") { }
 
             //Befehl wird gelöscht, da er verwendet wurde
             _recievedCommand = String.Empty;
