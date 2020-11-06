@@ -27,10 +27,10 @@ namespace _2DAG_Designer.Arduino.Engrave
         private static bool progressChanged = true;
 
         /// <summary>
-        /// Graviervorgang wird gestertet
+        /// Informationen werden auf den Arduino geladen
         /// </summary>
         /// <param name="drawables">Elemente, die graviert werden sollen</param>
-        public static void Start(IDrawable[] drawables)
+        public static void Upload(IDrawable[] drawables)
         {
             //Vorgang wird beendet, wenn keine Verbindung zum Arduino besteht
             if (!Communication.IsConnected)
@@ -58,6 +58,18 @@ namespace _2DAG_Designer.Arduino.Engrave
 
             //Behandlung für die Änderung der Fortschrittsanzeige
             HandleProgressChanges();
+
+            //Startbutton für das Einbrennen wird aktiviert
+            MainWindow.ThisWindow.StartButton.IsEnabled = true;
+        }
+
+        /// <summary>
+        /// Brennprozess wird gestartet
+        /// </summary>
+        public static void Start()
+        {
+            //Start Befehl wird gesendet
+            Send("!START");
         }
 
         /// <summary>

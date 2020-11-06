@@ -434,8 +434,16 @@ namespace _2DAG_Designer
                 ////Bewegung in Y Richtung
                 //ArduinoTest.MoveY((int)Math.Round(PixelToCentimeter(DrawList.Last().Height)));
 
-                Engrave.Start(DrawList.ToArray());
+                Engrave.Upload(DrawList.ToArray());
             }
+        }
+
+        private void StartButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Wenn eine Verbindung besteht
+            if (Communication.IsConnected)
+                // Prozess wird gestartet
+                Engrave.Start();
         }
 
         #endregion
@@ -1132,6 +1140,7 @@ namespace _2DAG_Designer
                 Application.Current.MainWindow.Width = WindowWidth;
             }
         }
+
 
         #endregion
         //-------------------------------------------------
