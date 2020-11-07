@@ -21,13 +21,15 @@ namespace _2DAG_Designer.DrawingObjects.Objects
     {
         #region Variablen
        
-        private Point ObjectEnd;
 
         //true wenn der Bogen in die andere Richtung zeigen soll
         public bool ArcInverted = false;
 
-        //true wenn die Höhe beibehalten werden soll
-        public bool KeepHeight = false;
+
+        private Point ObjectEnd;
+
+        //Mittelpunkt des Kreises
+        private Point _centerPoint;
 
         #endregion
 
@@ -36,20 +38,17 @@ namespace _2DAG_Designer.DrawingObjects.Objects
         /// <summary>
         /// Constructor mit Endpunkt
         /// </summary>
-        /// <param name="startPoint"></param>
-        /// <param name="endPoint"></param>
-        /// <param name="angle"></param>
-        /// <param name="color"></param>
         /// <param name="roundEnd">true wenn das Ende auf 0,5 cm gerundet werden soll</param>
-        public DrawArc(Point startPoint, Point endPoint,
+        public DrawArc(Point startPoint, double radius, double circleSize,  double startAngle,
             SolidColorBrush color, bool roundEnd)
         {
-            // druch Klicken erstellt, höhe soll nicht beibehalten werden
-            KeepHeight = false;
-
-            //s. http://www.blackwasp.co.uk/WPFArcSegment.aspx
-
+            //Startpunkt
             this.ObjectStart = startPoint;
+
+            //Mittelpunkt wird mit dem startpunkt, dem Radius und dem Startwinkel - 90 berechnet
+            this._centerPoint = CalculatePoint(startPoint, radius, startAngle - 90);
+
+
             this.ActualObjectEnd = endPoint;
 
 
@@ -89,49 +88,49 @@ namespace _2DAG_Designer.DrawingObjects.Objects
             MainWindow.ThisWindow.AddToCanvas(this.ThisObject);
         }
 
-        /// <summary>
-        /// Constructor ohne Endpunkt
-        /// </summary>
-        /// <param name="startPoint"></param>
-        /// <param name="width"></param>
-        /// <param name="height"></param>
-        /// <param name="angle"></param>
-        /// <param name="color"></param>
-        public DrawArc(Point startPoint, 
-            double width, double height, double angle, SolidColorBrush color)
-        {
-            //durch das Menü erstellt, Höhe soll beibehalten werden
-            KeepHeight = true;
+        ///// <summary>
+        ///// Constructor ohne Endpunkt
+        ///// </summary>
+        ///// <param name="startPoint"></param>
+        ///// <param name="width"></param>
+        ///// <param name="height"></param>
+        ///// <param name="angle"></param>
+        ///// <param name="color"></param>
+        //public DrawArc(Point startPoint, 
+        //    double width, double height, double angle, SolidColorBrush color)
+        //{
+        //    //durch das Menü erstellt, Höhe soll beibehalten werden
+        //    KeepHeight = true;
 
-            //s. http://www.blackwasp.co.uk/WPFArcSegment.aspx
+        //    //s. http://www.blackwasp.co.uk/WPFArcSegment.aspx
 
-            this.ObjectStart = startPoint;
+        //    this.ObjectStart = startPoint;
 
-            //das Objektende wird aus dem Startpunkt und der Breite berechnet
-            this.ObjectEnd.X = ObjectStart.X + width;
-            this.ObjectEnd.Y = ObjectStart.Y;
-
-
-            //Farbe und Winkel festgelegt
-            this.Color = color;
-            this.Angle = angle;
-
-            //Tatsächliches Ende wird berechnet
-            CalculateActualEnd();
+        //    //das Objektende wird aus dem Startpunkt und der Breite berechnet
+        //    this.ObjectEnd.X = ObjectStart.X + width;
+        //    this.ObjectEnd.Y = ObjectStart.Y;
 
 
-            this.Width = width;
-            this.Height = height;
+        //    //Farbe und Winkel festgelegt
+        //    this.Color = color;
+        //    this.Angle = angle;
+
+        //    //Tatsächliches Ende wird berechnet
+        //    CalculateActualEnd();
 
 
-            //neuer Arc wird mit den Werten erstellt
-            ThisObject = CreatePath();
+        //    this.Width = width;
+        //    this.Height = height;
 
-            MainWindow.DrawList.Add(this);
 
-            //Objekt wird zum Canvas hinzugefügt
-            MainWindow.ThisWindow.AddToCanvas(this.ThisObject);
-        }
+        //    //neuer Arc wird mit den Werten erstellt
+        //    ThisObject = CreatePath();
+
+        //    MainWindow.DrawList.Add(this);
+
+        //    //Objekt wird zum Canvas hinzugefügt
+        //    MainWindow.ThisWindow.AddToCanvas(this.ThisObject);
+        //}
 
         #endregion
 
@@ -254,7 +253,14 @@ namespace _2DAG_Designer.DrawingObjects.Objects
             CalculateActualEnd();
         }
 
-  
+        private Point CalculatePoint(Point startPoint, double disctance, double angle)
+        {
+            return new Point()
+            {
+                X = startPoint.X + (Math.Sin(angle * (Math.PI / 180.0)) * disctance),
+                Y = startPoint.Y + (Math.Cos(angle * (Math.PI / 180.0)) * disctance)
+            };
+        }
         
         private Path CreatePath()
         {

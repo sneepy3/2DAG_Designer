@@ -300,18 +300,13 @@ namespace _2DAG_Designer
         }
 
         private void CreateArcButton_Click(object sender, RoutedEventArgs e)
-        {
-            //Werte aus den Textboxen
-            double widthText;
-            double heightText;
-            double angleText;
-
+        {         
             try
             {
                 //Werte aus den Textboxen werden abgespeichert
-                widthText = Convert.ToDouble(WidthTextBox.Text);
-                heightText = Convert.ToDouble(HeightTextBox.Text);
-                angleText = Convert.ToDouble(AngleTextBox.Text);
+                double radius = Convert.ToDouble(RadiusTextBox.Text);
+                double circleSize = Convert.ToDouble(CircleSizeTextBox.Text);
+
 
                 //die Breite und Höhe müssen größer sein als 0
                 if((widthText <= 0) || (heightText <= 0))

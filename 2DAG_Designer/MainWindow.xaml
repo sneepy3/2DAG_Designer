@@ -307,19 +307,14 @@
 
 
                         <Border Margin="27, -3" Height="22">
-                            <TextBlock FontFamily="Helvetica" Text="Halbkreis erstellen" TextAlignment="Center" HorizontalAlignment="Center" Width="120"  />
+                            <TextBlock FontFamily="Helvetica" Text="Kreis erstellen" TextAlignment="Center" HorizontalAlignment="Center" Width="120"  />
                         </Border>
 
-
-                        <Label Height="23" Width="120" Content="Höhe"  />
-                        <TextBox x:Name="HeightTextBox" Text=""  Height="23" Width="120" TextWrapping="Wrap"  HorizontalAlignment="Center" VerticalAlignment="Top" />
-
-                        <Label  Height="23" Width="120" Content="Breite" Margin="0,0,0,0" />
-                        <TextBox x:Name="WidthTextBox" Text="" Height="23" Width="120" TextWrapping="Wrap"  HorizontalAlignment="Center" VerticalAlignment="Top"  />
-
+                        <Label Height="23" Width="120" Content="Radius"  />
+                        <TextBox x:Name="RadiusTextBox" Text=""  Height="23" Width="120" TextWrapping="Wrap"  HorizontalAlignment="Center" VerticalAlignment="Top" />
 
                         <Label  Height="23" Width="120" Content="Winkel" Margin="0,0,0,0" />
-                        <TextBox x:Name="AngleTextBox" Text="0" Height="24" Width="120" TextWrapping="Wrap"  HorizontalAlignment="Center" VerticalAlignment="Top"  />
+                        <TextBox x:Name="CircleSizeTextBox" Text="" Height="23" Width="120" TextWrapping="Wrap"  HorizontalAlignment="Center" VerticalAlignment="Top"  />
 
                         <Button x:Name="CreateArcButton" Content="erstellen" Margin="0 5" Width="70" Click="CreateArcButton_Click"/>
                     </StackPanel>

@@ -154,10 +154,8 @@ namespace _2DAG_Designer.DrawingObjects
         /// </summary>
         public void GetAngle()
         {
-            bool endRight;
-
             //Wenn das Ende rechts vom Start ist, wird endRight true
-            endRight = ActualObjectEnd.X >= ObjectStart.X;
+            bool endRight = ActualObjectEnd.X >= ObjectStart.X;
 
             //            Gegenkathete                              Ankathete
             var sine = (ActualObjectEnd.Y - ObjectStart.Y) / (ActualObjectEnd.X - ObjectStart.X);
