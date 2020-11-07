@@ -40,7 +40,7 @@ namespace _2DAG_Designer.DrawingObjects.Objects
         /// <summary>
         /// Constructor
         /// </summary>
-        public DrawArc(Point startPoint, double radius, double circleSize,  double startAngle,
+        public DrawArc(Point startPoint, double radius, double circleSizeAngle,  double startAngle,
             SolidColorBrush color)
         {
             //Startpunkt
@@ -48,14 +48,14 @@ namespace _2DAG_Designer.DrawingObjects.Objects
 
             //Winkel für die Berechnung des Mittelpunkts
             //Mittelpunkt ist vom Startpunkt aus um Startwinkel + 90 Grad verschoben
-            var centerPointAngle = startAngle + 90;
+            var centerPointAngle = startAngle;
 
 
             //Mittelpunkt wird mit dem startpunkt, dem Radius und dem Winkel berechnet
             this._centerPoint = CalculatePoint(startPoint, radius, centerPointAngle);
 
-
-            this.ActualObjectEnd = CalculatePoint(_centerPoint, radius);
+            //Berechnung des Endpunktes
+            this.ActualObjectEnd = CalculatePoint(_centerPoint, radius, -180.0 + ((90 - startAngle) + startAngle));
 
             //Radius des Kreises
             this.Radius = radius;
@@ -149,9 +149,6 @@ namespace _2DAG_Designer.DrawingObjects.Objects
             //die Breite ist der Abstend zwischen dem Start und dem Endpunkt
             Width = Math.Sqrt(Math.Pow(ActualObjectEnd.X - ObjectStart.X, 2) + Math.Pow(ActualObjectEnd.Y - ObjectStart.Y, 2));
 
-            //Wenn die Höhe nicht beibehalten werden soll, ist sie gleich wei die Breite
-            if ((!KeepHeight)) 
-                Height = Width / 2; // geteilt durch 2, da width nur ein Radius ist
 
             //Winkel wird berechnet
             GetAngle();
@@ -269,9 +266,14 @@ namespace _2DAG_Designer.DrawingObjects.Objects
         private Path CreatePath()
         {
             //Pfad wird erstellt
-            var path = new Path();
             var pf = new PathFigure();
             var pg = new PathGeometry();
+            var path = new Path()
+            {
+                Stroke = Brushes.Black,
+                StrokeThickness = 3,
+                Data = pg
+            };
             pg.Figures.Add(pf);
 
             //Startpunkt
@@ -282,7 +284,7 @@ namespace _2DAG_Designer.DrawingObjects.Objects
             pf.Segments.Add(new ArcSegment()
             {
                 Size = new Size(this.Radius, this.Radius),
-                Point = this.ObjectEnd,
+                Point = this.ActualObjectEnd,
                 SweepDirection = SweepDirection.Clockwise,
                 IsLargeArc = false
             });
@@ -314,9 +316,7 @@ namespace _2DAG_Designer.DrawingObjects.Objects
             line[0] += ObjectInformation.width.InformationToString(Width);
             line[0] += ObjectInformation.height.InformationToString(Height);
 
-            //sonstige Informationen                                     
-            line[0] += ObjectInformation.keepHeight.InformationToString(KeepHeight);
-            line[0] += ObjectInformation.inverted.InformationToString(ArcInverted);
+            
 
             //string mit den Informationen des Objekts wird zurückgegeben
             return line;

@@ -286,9 +286,9 @@ namespace _2DAG_Designer
                     if(DrawLines)
                         // die Linie wird gezeichnet in schwarz
                         DrawLine(newShapeStart, newShapeEnd, Brushes.Black);
-                    else
+                    //else
                         //Bogen wird in schwarz gezeichnet
-                        DrawArc(newShapeStart, newShapeEnd, Brushes.Black);
+                        //DrawArc(newShapeStart, newShapeEnd, Brushes.Black);
 
                     //drawArc(drawList.Last().GetStart(),
                     //       100, 100, 0, Brushes.Black);
@@ -305,11 +305,11 @@ namespace _2DAG_Designer
             {
                 //Werte aus den Textboxen werden abgespeichert
                 double radius = Convert.ToDouble(RadiusTextBox.Text);
-                double circleSize = Convert.ToDouble(CircleSizeTextBox.Text);
+                double circleSizeAngle = Convert.ToDouble(CircleSizeTextBox.Text);
 
 
-                //die Breite und Höhe müssen größer sein als 0
-                if((widthText <= 0) || (heightText <= 0))
+                //der Radius und die Größe des Kreises müssen positiv sein
+                if((circleSizeAngle <= 0) || (radius <= 0))
                 {
                     throw new Exception("");
                 }
@@ -317,12 +317,11 @@ namespace _2DAG_Designer
                 //Wenn die Konvertierung nicht funktioniert, wird der folgende Teil automatisch übersprungen
 
                 //Umrechnung von cm in Pixel
-                widthText   *= (DrawRowSize / 15);
-                heightText  *= (DrawRowSize / 15);
-                    
-                //der Bogen wird gezeichnet
+                radius = CentimeterTopixel(radius);
+
+                //der Kreis wird gezeichnet
                 DrawArc(DrawList.Last().GetEnd(),
-                        widthText, heightText, angleText, Brushes.Black);
+                        radius, circleSizeAngle, DrawList.Last().Angle, Brushes.Black);
 
                 //wenn alles funktioniert hat, bleibt die Umrandung des Buttons schwarz
                 CreateArcButton.BorderBrush = Brushes.Gray;
@@ -585,10 +584,10 @@ namespace _2DAG_Designer
         /// <param name="height"></param>
         /// <param name="angle"></param>
         /// <param name="color"></param>
-        private void DrawArc(Point startPoint, Point endPoint, SolidColorBrush color)
+        private void DrawArc(Point startPoint,double radius, double circleSizeAngle, double startAngle, SolidColorBrush color)
         {
             //Bogen wird erstellt und der objectCanvas hinzugefügt
-            new DrawArc(startPoint, endPoint, color, true);
+            new DrawArc(startPoint, radius, circleSizeAngle, startAngle, color);
            
             //addToCanvas(DrawList.Last().ThisObject);
 
@@ -604,16 +603,16 @@ namespace _2DAG_Designer
         /// <param name="height"></param>
         /// <param name="angle"></param>
         /// <param name="color"></param>
-        private void DrawArc(Point startPoint, double width, double height, double angle, SolidColorBrush color)
-        {
-            //Bogen wird erstellt und der objectCanvas hinzugefügt
-            new DrawArc(startPoint, width, height, angle, color);
+        //private void DrawArc(Point startPoint, double width, double height, double angle, SolidColorBrush color)
+        //{
+        //    //Bogen wird erstellt und der objectCanvas hinzugefügt
+        //    new DrawArc(startPoint, width, height, angle, color);
             
-            //addToCanvas(DrawList.Last().ThisObject);
+        //    //addToCanvas(DrawList.Last().ThisObject);
 
-            //Aktion wird der Aktionsliste hinzugefügt
-            ActionList.Add(ActionType.Draw);
-        }
+        //    //Aktion wird der Aktionsliste hinzugefügt
+        //    ActionList.Add(ActionType.Draw);
+        //}
         #endregion
 
         #region undraw/restore

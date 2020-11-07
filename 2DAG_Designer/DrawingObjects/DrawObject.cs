@@ -267,7 +267,7 @@ namespace _2DAG_Designer.DrawingObjects
             //Winkel
             var angle = double.Parse(informations.GetObjectInformation(ObjectInformation.angle));
 
-            DrawObject newObject;
+            DrawObject newObject = null;
 
             switch (objectType)
             {
@@ -285,29 +285,29 @@ namespace _2DAG_Designer.DrawingObjects
                     break;
                 case ObjectTypes.Arc:
                     {
-                        var keepHeight = bool.Parse(informations.GetObjectInformation(ObjectInformation.keepHeight));
+                        //var keepHeight = bool.Parse(informations.GetObjectInformation(ObjectInformation.keepHeight));
 
-                        DrawArc newArc;
+                        //DrawArc newArc;
 
-                        //Wenn höhe beibehalten werden soll,
-                        if (keepHeight)
-                        {
-                            //wird der Bogen ohne Endpunkt erstellt
-                            newArc = new DrawArc(MainWindow.DrawList.Last().GetEnd(), width, height, angle, color);
-                        }
-                        else
-                        {
-                            //sonst wird er mit Endpunkt erstellt
-                            newArc = new DrawArc(MainWindow.DrawList.Last().GetEnd(), endPoint, color, false);
-                        }
+                        ////Wenn höhe beibehalten werden soll,
+                        //if (keepHeight)
+                        //{
+                        //    //wird der Bogen ohne Endpunkt erstellt
+                        //    newArc = new DrawArc(MainWindow.DrawList.Last().GetEnd(), width, height, angle, color);
+                        //}
+                        //else
+                        //{
+                        //    //sonst wird er mit Endpunkt erstellt
+                        //    newArc = new DrawArc(MainWindow.DrawList.Last().GetEnd(), endPoint, color, false);
+                        //}
 
-                        newArc.ArcInverted = bool.Parse(informations.GetObjectInformation(ObjectInformation.inverted));
+                        //newArc.ArcInverted = bool.Parse(informations.GetObjectInformation(ObjectInformation.inverted));
 
-                        //ist der Bogen invertiert, wird er erneut gezeichnet
-                        if (newArc.ArcInverted)
-                            newArc.Redraw();
+                        ////ist der Bogen invertiert, wird er erneut gezeichnet
+                        //if (newArc.ArcInverted)
+                        //    newArc.Redraw();
 
-                        newObject = newArc;
+                        //newObject = newArc;
 
                     }
                     break;
