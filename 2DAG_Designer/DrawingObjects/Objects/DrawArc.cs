@@ -20,7 +20,9 @@ namespace _2DAG_Designer.DrawingObjects.Objects
     class DrawArc : DrawObject
     {
         #region Variablen
-       
+
+        //Radius des Kreise
+        public double Radius;
 
         //true wenn der Bogen in die andere Richtung zeigen soll
         public bool ArcInverted = false;
@@ -36,25 +38,27 @@ namespace _2DAG_Designer.DrawingObjects.Objects
         #region Constructor
 
         /// <summary>
-        /// Constructor mit Endpunkt
+        /// Constructor
         /// </summary>
-        /// <param name="roundEnd">true wenn das Ende auf 0,5 cm gerundet werden soll</param>
         public DrawArc(Point startPoint, double radius, double circleSize,  double startAngle,
-            SolidColorBrush color, bool roundEnd)
+            SolidColorBrush color)
         {
             //Startpunkt
             this.ObjectStart = startPoint;
 
-            //Mittelpunkt wird mit dem startpunkt, dem Radius und dem Startwinkel - 90 berechnet
-            this._centerPoint = CalculatePoint(startPoint, radius, startAngle - 90);
+            //Winkel für die Berechnung des Mittelpunkts
+            //Mittelpunkt ist vom Startpunkt aus um Startwinkel + 90 Grad verschoben
+            var centerPointAngle = startAngle + 90;
 
 
-            this.ActualObjectEnd = endPoint;
+            //Mittelpunkt wird mit dem startpunkt, dem Radius und dem Winkel berechnet
+            this._centerPoint = CalculatePoint(startPoint, radius, centerPointAngle);
 
 
-            //Runden wenn gerundet werden soll
-            if(roundEnd)
-                Round();
+            this.ActualObjectEnd = CalculatePoint(_centerPoint, radius);
+
+            //Radius des Kreises
+            this.Radius = radius;
 
             //Abstand von Start und Endpunkt wird berechnet
             var distanceStartEnd = Math.Sqrt(Math.Pow((ObjectStart.X - ActualObjectEnd.X), 2) + Math.Pow((ObjectStart.Y - ActualObjectEnd.Y), 2));
@@ -264,70 +268,27 @@ namespace _2DAG_Designer.DrawingObjects.Objects
         
         private Path CreatePath()
         {
-            Point startpoint;
-            Point endpoint;
-
-            // wenn der Bogen invertiert ist, dann wird der Start und EndPunkt vertauscht
-            if (ArcInverted)
-            {
-                startpoint = ObjectEnd;
-                endpoint = ObjectStart;
-            }
-            else
-            {
-                startpoint = ObjectStart;
-                endpoint = ObjectEnd;
-            }
-
-            var rt = new RotateTransform()
-            {
-                CenterX = ObjectStart.X,
-                CenterY = ObjectStart.Y,
-                Angle = Angle
-            };
-
-            //Bogen wird erstellt
-            var arc = new ArcSegment()
-            {
-                //größe des Bogens
-                Size = new Size(Width / 2, Height), // geteilt durch 2, da width nur ein Radius ist
-
-                //Endpunkt des Bogens
-                Point = endpoint,
-            };
-
-            var pf = new PathFigure()
-            {
-                //Startpunkt 
-                StartPoint = startpoint,
-                IsClosed = false,
-            };
-            //arc wird zu den Pfadfiguren hinzugefügt
-            pf.Segments.Add(arc);
-
-            var pg = new PathGeometry()
-            {
-                Transform = rt
-            };
-
-
-            //pf wird pg hinzugefügt
+            //Pfad wird erstellt
+            var path = new Path();
+            var pf = new PathFigure();
+            var pg = new PathGeometry();
             pg.Figures.Add(pf);
 
+            //Startpunkt
+            pf.StartPoint = this.ObjectStart;
 
-            //Ein Pfad wird erstellt
-            var newPath = new Path()
+            //Der PathFigure wird ein ArcSegment hinzugefügt
+            //es beihaltet den gewünschten Kreisanteil
+            pf.Segments.Add(new ArcSegment()
             {
-                Stroke = Color,
-                StrokeThickness = 2,
+                Size = new Size(this.Radius, this.Radius),
+                Point = this.ObjectEnd,
+                SweepDirection = SweepDirection.Clockwise,
+                IsLargeArc = false
+            });
 
-                //Inhalt des Pfades ist pg
-                Data = pg,
-
-
-            };
-
-            return newPath;
+            //Pfad wird zurückgegeben
+            return path;
         }
 
         #endregion
