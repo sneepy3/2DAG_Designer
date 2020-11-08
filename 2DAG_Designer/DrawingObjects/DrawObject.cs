@@ -152,7 +152,7 @@ namespace _2DAG_Designer.DrawingObjects
         /// <summary>
         /// Berechnet den Winkel des Objekts zur Horizontalen
         /// </summary>
-        public void GetAngle()
+        public virtual void GetAngle()
         {
             //Wenn das Ende rechts vom Start ist, wird endRight true
             bool endRight = ActualObjectEnd.X >= ObjectStart.X;

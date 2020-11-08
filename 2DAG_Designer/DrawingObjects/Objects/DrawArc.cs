@@ -33,6 +33,12 @@ namespace _2DAG_Designer.DrawingObjects.Objects
         //Mittelpunkt des Kreises
         private Point _centerPoint;
 
+        //Größe des Kreises (90 => 1/4 Kreis)
+        private double CircleSizeAngle;
+
+        //Anfangswinkel des Kreises
+        private double StartAngle;
+
         #endregion
 
         #region Constructor
@@ -46,19 +52,34 @@ namespace _2DAG_Designer.DrawingObjects.Objects
             //Startpunkt
             this.ObjectStart = startPoint;
 
+            //Anfangswinkel
+            this.StartAngle = startAngle;
+
+            //Radius des Kreises
+            this.Radius = radius;
+         
+            //Farbe und Winkel festgelegt
+            this.Color = color;
+
+            //Größe des Kreises
+            this.CircleSizeAngle = circleSizeAngle;
+            
             //Winkel für die Berechnung des Mittelpunkts
             //Mittelpunkt ist vom Startpunkt aus um Startwinkel + 90 Grad verschoben
-            var centerPointAngle = startAngle;
+            var centerPointAngle = startAngle + 90;
 
+            //Winkel vom Mittel zum Endpunkt wird berechnet
+            var endPointAngle = -180.0 + (centerPointAngle + circleSizeAngle);
 
             //Mittelpunkt wird mit dem startpunkt, dem Radius und dem Winkel berechnet
             this._centerPoint = CalculatePoint(startPoint, radius, centerPointAngle);
 
-            //Berechnung des Endpunktes
-            this.ActualObjectEnd = CalculatePoint(_centerPoint, radius, -180.0 + ((90 - startAngle) + startAngle));
+            MainWindow.ThisWindow.AddToCanvas(new Ellipse() {Margin = new Thickness(_centerPoint.X - 2.5, _centerPoint.Y - 2.5, 0, 0), Width = 5, Height = 5, Fill = Brushes.Red });
 
-            //Radius des Kreises
-            this.Radius = radius;
+            //Berechnung des Endpunktes
+            this.ActualObjectEnd = CalculatePoint(_centerPoint, radius, endPointAngle);
+
+
 
             //Abstand von Start und Endpunkt wird berechnet
             var distanceStartEnd = Math.Sqrt(Math.Pow((ObjectStart.X - ActualObjectEnd.X), 2) + Math.Pow((ObjectStart.Y - ActualObjectEnd.Y), 2));
@@ -74,11 +95,7 @@ namespace _2DAG_Designer.DrawingObjects.Objects
 
             //Wird der Abstand zwischen Start und Ende addiert
             this.ObjectEnd.X = ObjectStart.X + distanceStartEnd;
-
-
-            //Farbe und Winkel festgelegt
-            this.Color = color;
-            
+                        
             //Winkel wird berechnet 
             GetAngle();
       
@@ -139,6 +156,23 @@ namespace _2DAG_Designer.DrawingObjects.Objects
         #endregion
 
         #region Helper
+
+        public override void GetAngle()
+        {
+            //Winkel für die Berechnung des Mittelpunkts
+            //Mittelpunkt ist vom Startpunkt aus um Startwinkel + 90 Grad verschoben
+            var centerPointAngle = StartAngle + 90;
+
+            //Winkel vom Mittel zum Endpunkt wird berechnet
+            var endPointAngle = -180.0 + (centerPointAngle + CircleSizeAngle);
+
+            //Berechnung des Winkels
+            this.Angle = 90 + endPointAngle;
+
+            //Wenn der Winkel größer als 360 ist, wird 360 abgezogen, kein visueller Effekt
+            if (Angle >= 360)
+                Angle -= 360;
+        }
 
         public override void Redraw()
         {
@@ -258,8 +292,8 @@ namespace _2DAG_Designer.DrawingObjects.Objects
         {
             return new Point()
             {
-                X = startPoint.X + (Math.Sin(angle * (Math.PI / 180.0)) * disctance),
-                Y = startPoint.Y + (Math.Cos(angle * (Math.PI / 180.0)) * disctance)
+                X = startPoint.X + (Math.Cos(angle * (Math.PI / 180.0)) * disctance),
+                Y = startPoint.Y + (Math.Sin(angle * (Math.PI / 180.0)) * disctance)
             };
         }
         
@@ -271,13 +305,17 @@ namespace _2DAG_Designer.DrawingObjects.Objects
             var path = new Path()
             {
                 Stroke = Brushes.Black,
-                StrokeThickness = 3,
+                StrokeThickness = 2.5,
                 Data = pg
             };
             pg.Figures.Add(pf);
 
             //Startpunkt
             pf.StartPoint = this.ObjectStart;
+
+            // gibt an, ob der Bogen dir größere oder kleinere Seite nehmen soll,
+            // bei einem Winkel von mehr als 180 Grad, soll die größere Seite genommen werden
+            bool isLargeArc = CircleSizeAngle > 180;
 
             //Der PathFigure wird ein ArcSegment hinzugefügt
             //es beihaltet den gewünschten Kreisanteil
@@ -286,7 +324,7 @@ namespace _2DAG_Designer.DrawingObjects.Objects
                 Size = new Size(this.Radius, this.Radius),
                 Point = this.ActualObjectEnd,
                 SweepDirection = SweepDirection.Clockwise,
-                IsLargeArc = false
+                IsLargeArc = isLargeArc
             });
 
             //Pfad wird zurückgegeben
