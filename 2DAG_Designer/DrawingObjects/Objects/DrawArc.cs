@@ -27,9 +27,6 @@ namespace _2DAG_Designer.DrawingObjects.Objects
         //true wenn der Bogen in die andere Richtung zeigen soll
         public bool ArcInverted = false;
 
-
-        private Point ObjectEnd;
-
         //Mittelpunkt des Kreises
         private Point _centerPoint;
 
@@ -49,6 +46,8 @@ namespace _2DAG_Designer.DrawingObjects.Objects
         public DrawArc(Point startPoint, double radius, double circleSizeAngle,  double startAngle,
             SolidColorBrush color)
         {
+            #region Werte abspeichern
+
             //Startpunkt
             this.ObjectStart = startPoint;
 
@@ -63,45 +62,31 @@ namespace _2DAG_Designer.DrawingObjects.Objects
 
             //Größe des Kreises
             this.CircleSizeAngle = circleSizeAngle;
-            
+
+            #endregion
+
+
             //Winkel für die Berechnung des Mittelpunkts
             //Mittelpunkt ist vom Startpunkt aus um Startwinkel + 90 Grad verschoben
             var centerPointAngle = startAngle + 90;
-
-            //Winkel vom Mittel zum Endpunkt wird berechnet
-            var endPointAngle = -180.0 + (centerPointAngle + circleSizeAngle);
 
             //Mittelpunkt wird mit dem startpunkt, dem Radius und dem Winkel berechnet
             this._centerPoint = CalculatePoint(startPoint, radius, centerPointAngle);
 
             MainWindow.ThisWindow.AddToCanvas(new Ellipse() {Margin = new Thickness(_centerPoint.X - 2.5, _centerPoint.Y - 2.5, 0, 0), Width = 5, Height = 5, Fill = Brushes.Red });
 
-            //Berechnung des Endpunktes
-            this.ActualObjectEnd = CalculatePoint(_centerPoint, radius, endPointAngle);
-
-
-
-            //Abstand von Start und Endpunkt wird berechnet
-            var distanceStartEnd = Math.Sqrt(Math.Pow((ObjectStart.X - ActualObjectEnd.X), 2) + Math.Pow((ObjectStart.Y - ActualObjectEnd.Y), 2));
+            //Endpunkt wird berechnet
+            CalculateEnd();
 
             //Breite und Höhe werden berechnet
-            this.Width = distanceStartEnd; 
-            this.Height = Width / 2; // geteilt durch 2, da width nur ein Radius ist
-
-            //Ende wird berechnet
-            //auf gleicher Höhe wie der Start
-            this.ObjectEnd.Y = ObjectStart.Y;
-
-
-            //Wird der Abstand zwischen Start und Ende addiert
-            this.ObjectEnd.X = ObjectStart.X + distanceStartEnd;
+            GetMeasures();
                         
             //Winkel wird berechnet 
-            GetAngle();
-      
+            GetAngle();     
 
             //neuer Arc wird mit den Werten erstellt
             ThisObject = CreatePath();
+
 
             MainWindow.DrawList.Add(this);
 
@@ -187,22 +172,6 @@ namespace _2DAG_Designer.DrawingObjects.Objects
             //Winkel wird berechnet
             GetAngle();
 
-            //Wenn das Ende links vom Start liegt, wird die Breite abgezogen 
-            //kommt nur bei Objekten vor, die nicht vom Menü aus erstellt wurden, da das Menu das Ende immer rechts vom Anfang setzt
-            if ((ObjectEnd.X < ObjectStart.X))
-            {
-                //Objektende ist Objektstart - Breite 
-                ObjectEnd.X = ObjectStart.X - Width ;
-                Angle -= 180;
-            }
-            else
-            {
-                //Objektende ist Objektstart + Breite 
-                ObjectEnd.X = ObjectStart.X + Width;
-            }
-
-            //Die Höhe vom Ende ist gleich der Höhe vom Start
-            ObjectEnd.Y = ObjectStart.Y;
 
             #endregion
 
@@ -234,8 +203,8 @@ namespace _2DAG_Designer.DrawingObjects.Objects
             //neuer Path wird erstellt
             ThisObject = CreatePath();
 
-            //ActualObjectEnd wird berechnet
-            CalculateActualEnd();
+            // Ende wird berechnet
+            CalculateEnd();
 
 
             //zum Canvas hinzufügen
@@ -268,26 +237,28 @@ namespace _2DAG_Designer.DrawingObjects.Objects
             }
         }
 
-        /// <summary>
-        /// Berechnet den tatsächlichen Endpunkt des Bogens
-        /// </summary>
-        private void CalculateActualEnd() 
-        {
-            //Tatsächliches ende = Start        + (     Verschiebung vom Start     )
-            ActualObjectEnd.X = ObjectStart.X + (ObjectEnd.X - ObjectStart.X) * Math.Cos(Angle * (Math.PI / 180.0)); //* (Math.PI / 180.0) rechnet grad in radianten um
-            ActualObjectEnd.Y = ObjectStart.Y + (ObjectEnd.X - ObjectStart.X) * Math.Sin(Angle * (Math.PI / 180.0));
-        }
 
         public override void CalculateEnd()
         {
-            //Endpunkt wird berechnet
-            ObjectEnd.X = ObjectStart.X + Width;
-            ObjectEnd.Y = ObjectStart.Y + Height;
+            //Winkel für die Berechnung des Mittelpunkts
+            //Mittelpunkt ist vom Startpunkt aus um Startwinkel + 90 Grad verschoben
+            var centerPointAngle = StartAngle + 90;
 
-            //tatsächliches Ende wird berechnet
-            CalculateActualEnd();
+            //Winkel vom Mittel zum Endpunkt wird berechnet
+            var endPointAngle = -180.0 + (centerPointAngle + CircleSizeAngle);
+
+            //Berechnung des Endpunktes
+            this.ActualObjectEnd = CalculatePoint(_centerPoint, Radius, endPointAngle);
         }
 
+        /// <summary>
+        /// Berechnet Punkt anhand eines anderen Punkts,
+        /// dem Abstand und dem Winkel
+        /// </summary>
+        /// <param name="startPoint"></param>
+        /// <param name="disctance"></param>
+        /// <param name="angle"></param>
+        /// <returns></returns>
         private Point CalculatePoint(Point startPoint, double disctance, double angle)
         {
             return new Point()
@@ -297,6 +268,11 @@ namespace _2DAG_Designer.DrawingObjects.Objects
             };
         }
         
+        private void GetMeasures()
+        {
+
+        }
+
         private Path CreatePath()
         {
             //Pfad wird erstellt
