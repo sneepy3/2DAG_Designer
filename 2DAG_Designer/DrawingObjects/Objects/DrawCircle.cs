@@ -17,15 +17,12 @@ using static _2DAG_Designer.FileIO.DrawFile;
 
 namespace _2DAG_Designer.DrawingObjects.Objects
 {
-    class DrawArc : DrawObject
+    class DrawCircle : DrawObject
     {
         #region Variablen
 
         //Radius des Kreise
         public double Radius;
-
-        //true wenn der Bogen in die andere Richtung zeigen soll
-        public bool ArcInverted = false;
 
         //Mittelpunkt des Kreises
         private Point _centerPoint;
@@ -43,7 +40,7 @@ namespace _2DAG_Designer.DrawingObjects.Objects
         /// <summary>
         /// Constructor
         /// </summary>
-        public DrawArc(Point startPoint, double radius, double circleSizeAngle,  double startAngle,
+        public DrawCircle(Point startPoint, double radius, double circleSizeAngle,  double startAngle,
             SolidColorBrush color)
         {
             #region Werte abspeichern
@@ -57,35 +54,33 @@ namespace _2DAG_Designer.DrawingObjects.Objects
             //Radius des Kreises
             this.Radius = radius;
          
+
             //Farbe und Winkel festgelegt
             this.Color = color;
 
             //Größe des Kreises
             this.CircleSizeAngle = circleSizeAngle;
 
+            //Die größe des Kreises, darf nicht größer als 360 sein
+            if(circleSizeAngle > 360)
+            {
+                CircleSizeAngle = 360;
+            }
+
             #endregion
 
+            //Winkel wird berechnet 
+            GetAngle();
 
-            //Winkel für die Berechnung des Mittelpunkts
-            //Mittelpunkt ist vom Startpunkt aus um Startwinkel + 90 Grad verschoben
-            var centerPointAngle = startAngle + 90;
-
-            //Mittelpunkt wird mit dem startpunkt, dem Radius und dem Winkel berechnet
-            this._centerPoint = CalculatePoint(startPoint, radius, centerPointAngle);
-
-            MainWindow.ThisWindow.AddToCanvas(new Ellipse() {Margin = new Thickness(_centerPoint.X - 2.5, _centerPoint.Y - 2.5, 0, 0), Width = 5, Height = 5, Fill = Brushes.Red });
-
-            //Endpunkt wird berechnet
+            //Endpunkt und Mittelpunkt wird berechnet
             CalculateEnd();
 
             //Breite und Höhe werden berechnet
             GetMeasures();
                         
-            //Winkel wird berechnet 
-            GetAngle();     
 
-            //neuer Arc wird mit den Werten erstellt
-            ThisObject = CreatePath();
+            //neuer Pfad wird mit den Werten erstellt
+            CreatePath();
 
 
             MainWindow.DrawList.Add(this);
@@ -93,50 +88,6 @@ namespace _2DAG_Designer.DrawingObjects.Objects
             //Objekt wird zum Canvas hinzugefügt
             MainWindow.ThisWindow.AddToCanvas(this.ThisObject);
         }
-
-        ///// <summary>
-        ///// Constructor ohne Endpunkt
-        ///// </summary>
-        ///// <param name="startPoint"></param>
-        ///// <param name="width"></param>
-        ///// <param name="height"></param>
-        ///// <param name="angle"></param>
-        ///// <param name="color"></param>
-        //public DrawArc(Point startPoint, 
-        //    double width, double height, double angle, SolidColorBrush color)
-        //{
-        //    //durch das Menü erstellt, Höhe soll beibehalten werden
-        //    KeepHeight = true;
-
-        //    //s. http://www.blackwasp.co.uk/WPFArcSegment.aspx
-
-        //    this.ObjectStart = startPoint;
-
-        //    //das Objektende wird aus dem Startpunkt und der Breite berechnet
-        //    this.ObjectEnd.X = ObjectStart.X + width;
-        //    this.ObjectEnd.Y = ObjectStart.Y;
-
-
-        //    //Farbe und Winkel festgelegt
-        //    this.Color = color;
-        //    this.Angle = angle;
-
-        //    //Tatsächliches Ende wird berechnet
-        //    CalculateActualEnd();
-
-
-        //    this.Width = width;
-        //    this.Height = height;
-
-
-        //    //neuer Arc wird mit den Werten erstellt
-        //    ThisObject = CreatePath();
-
-        //    MainWindow.DrawList.Add(this);
-
-        //    //Objekt wird zum Canvas hinzugefügt
-        //    MainWindow.ThisWindow.AddToCanvas(this.ThisObject);
-        //}
 
         #endregion
 
@@ -146,12 +97,12 @@ namespace _2DAG_Designer.DrawingObjects.Objects
         {
             //Winkel für die Berechnung des Mittelpunkts
             //Mittelpunkt ist vom Startpunkt aus um Startwinkel + 90 Grad verschoben
-            var centerPointAngle = StartAngle + 90;
-
+            var centerPointAngle = StartAngle + 90; 
+          
             //Winkel vom Mittel zum Endpunkt wird berechnet
             var endPointAngle = -180.0 + (centerPointAngle + CircleSizeAngle);
 
-            //Berechnung des Winkels
+            //Berechnung des Winkels am Ende des Kreises
             this.Angle = 90 + endPointAngle;
 
             //Wenn der Winkel größer als 360 ist, wird 360 abgezogen, kein visueller Effekt
@@ -161,25 +112,58 @@ namespace _2DAG_Designer.DrawingObjects.Objects
 
         public override void Redraw()
         {
-            //vom Canvas entfernen
-            MainWindow.ThisWindow.RemoveFromCanvas(ThisObject);
-
             #region Werte werden berechnet
-            //die Breite ist der Abstend zwischen dem Start und dem Endpunkt
-            Width = Math.Sqrt(Math.Pow(ActualObjectEnd.X - ObjectStart.X, 2) + Math.Pow(ActualObjectEnd.Y - ObjectStart.Y, 2));
 
+            #region Berechnung Radius und Mittelpunkt
 
-            //Winkel wird berechnet
-            GetAngle();
+            //Distanz Startpunkt Endpunkt
+            var distanceStartEnd = MainWindow.DistanceBetween(ObjectStart, ActualObjectEnd);
 
+            // ^auf X Achse
+            var distanceStartEndX = ActualObjectEnd.X - ObjectStart.X;
+            // ^auf Y Achse
+            var distanceStartEndY = ActualObjectEnd.Y - ObjectStart.Y;
+
+            //Startpunkt, Endpunkt und Mittelpunkt bilden ein gleichschenkliches Dreieck
+            //Winkel am Mittelpunkt ist CircleSizeAngle
+            //Winkel an den beiden äußeren Ecken (Startpunkt, Eckpunkt)
+            var cornerAngle = (180 - CircleSizeAngle) / 2;
+
+            //Winkel für die Berechnung des Mittelpunkts
+            var centerPointAngle = (Math.Atan(distanceStartEndY / distanceStartEndX) * (180.0/ Math.PI)) 
+                + cornerAngle;
+
+            // wenn das Ende links liegt, ist die obige Berechnung des centerPointAngle fehlerhaft
+            if(distanceStartEndX < 0)
+            {
+                //richtige Berechnung
+                centerPointAngle = 180 - (Math.Atan(distanceStartEndY / (-distanceStartEndX)) * (180.0 / Math.PI))
+                    + cornerAngle;
+            }
+
+            //Radius wird berechnet
+            this.Radius = (distanceStartEnd / 2) / Math.Sin((CircleSizeAngle / 2) * (Math.PI / 180.0));
+            Width = Radius;
+
+            //Mittelpunkt wird mit dem Startpunkt, dem Radius und dem Winkel berechnet
+            this._centerPoint = CalculatePoint(ObjectStart, Radius, centerPointAngle);
+
+            //der Anfangswinkel des Kreises wird aktualisiert
+            StartAngle = centerPointAngle - 90;
 
             #endregion
 
-            //neuer Path wird erstelle, mit den berechneten Werten
-            ThisObject = CreatePath();
 
-            //zum Canvas hinzufügen
-            MainWindow.ThisWindow.AddToCanvas(ThisObject);
+            // Winkel wird berechnet
+            GetAngle();
+
+            // Maße werden berechnet
+            GetMeasures();
+
+            #endregion
+
+            //neuer Path wird mit den berechneten Werten erstellt
+            CreatePath();
         }
 
         /// <summary>
@@ -199,9 +183,8 @@ namespace _2DAG_Designer.DrawingObjects.Objects
                 Angle -= 360;
             }
 
-
             //neuer Path wird erstellt
-            ThisObject = CreatePath();
+            CreatePath();
 
             // Ende wird berechnet
             CalculateEnd();
@@ -213,13 +196,9 @@ namespace _2DAG_Designer.DrawingObjects.Objects
 
         public override void Edit(EditObject edit)
         {
-            if (edit == EditObject.Invert)
-            {
-                //Arc wird invertiert
-                ArcInverted = !ArcInverted;
-            }
-
-            base.Edit(edit);
+            //Wenn kein ganzer Kreis angezeigt wird, können Änderungen vorgenommen werden
+            if(CircleSizeAngle != 360)
+                base.Edit(edit);
         }
 
         public override void Edit(EditObject edit, double factor)
@@ -244,8 +223,18 @@ namespace _2DAG_Designer.DrawingObjects.Objects
             //Mittelpunkt ist vom Startpunkt aus um Startwinkel + 90 Grad verschoben
             var centerPointAngle = StartAngle + 90;
 
+            //Mittelpunkt wird mit dem Startpunkt, dem Radius und dem Winkel berechnet
+            this._centerPoint = CalculatePoint(ObjectStart, Radius, centerPointAngle);
+
+            //Markierung Mittelpunkt
+            //MainWindow.ThisWindow.AddToCanvas(new Ellipse() { Margin = new Thickness(_centerPoint.X - 2.5, _centerPoint.Y - 2.5, 0, 0), Width = 5, Height = 5, Fill = Brushes.Red });
+
             //Winkel vom Mittel zum Endpunkt wird berechnet
             var endPointAngle = -180.0 + (centerPointAngle + CircleSizeAngle);
+            
+            //Die größe des Kreises, darf nicht 360 betragen, sonst wird nichts angezeigt
+            if (CircleSizeAngle == 360)
+                endPointAngle = -180.0 + (centerPointAngle + 359.999);
 
             //Berechnung des Endpunktes
             this.ActualObjectEnd = CalculatePoint(_centerPoint, Radius, endPointAngle);
@@ -268,12 +257,15 @@ namespace _2DAG_Designer.DrawingObjects.Objects
             };
         }
         
+        /// <summary>
+        /// Berechnung von Breite und Höhe
+        /// </summary>
         private void GetMeasures()
         {
 
         }
 
-        private Path CreatePath()
+        private void CreatePath()
         {
             //Pfad wird erstellt
             var pf = new PathFigure();
@@ -303,8 +295,17 @@ namespace _2DAG_Designer.DrawingObjects.Objects
                 IsLargeArc = isLargeArc
             });
 
-            //Pfad wird zurückgegeben
-            return path;
+            if(ThisObject != null)
+            {
+                var thisObject = (Path)ThisObject;
+
+                thisObject.Data = pg;
+            }
+            else
+            { 
+                //Pfad wird zurückgegeben
+                ThisObject = path;
+            }
         }
 
         #endregion

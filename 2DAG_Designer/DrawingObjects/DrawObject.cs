@@ -33,8 +33,6 @@ namespace _2DAG_Designer.DrawingObjects
                 /// </summary>
                 Size,
                 Angle,
-
-                Invert
             }
 
         //Farbe

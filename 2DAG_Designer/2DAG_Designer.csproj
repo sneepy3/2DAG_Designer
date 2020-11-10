@@ -73,7 +73,7 @@
     <Compile Include="DrawingObjects\Groups\DrawWord.cs" />
     <Compile Include="DrawingObjects\Edit\Edit.cs" />
     <Compile Include="DrawingObjects\IDrawable.cs" />
-    <Compile Include="DrawingObjects\Objects\DrawArc.cs" />
+    <Compile Include="DrawingObjects\Objects\DrawCircle.cs" />
     <Compile Include="DrawingObjects\Objects\DrawEllipse.cs" />
     <Compile Include="DrawingObjects\Objects\DrawLine.cs" />
     <Compile Include="FileIO\DrawFile.cs" />

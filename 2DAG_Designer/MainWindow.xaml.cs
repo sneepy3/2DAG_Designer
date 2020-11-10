@@ -320,7 +320,7 @@ namespace _2DAG_Designer
                 radius = CentimeterTopixel(radius);
 
                 //der Kreis wird gezeichnet
-                DrawArc(DrawList.Last().GetEnd(),
+                DrawCircle(DrawList.Last().GetEnd(),
                         radius, circleSizeAngle, DrawList.Last().Angle, Brushes.Black);
 
                 //wenn alles funktioniert hat, bleibt die Umrandung des Buttons schwarz
@@ -561,6 +561,7 @@ namespace _2DAG_Designer
         #region Helper
 
         #region drawing
+
         /// <summary>
         /// zeichnet eine Line vom Start zum Endpunkt   
         /// </summary>
@@ -584,35 +585,16 @@ namespace _2DAG_Designer
         /// <param name="height"></param>
         /// <param name="angle"></param>
         /// <param name="color"></param>
-        private void DrawArc(Point startPoint,double radius, double circleSizeAngle, double startAngle, SolidColorBrush color)
+        private void DrawCircle(Point startPoint,double radius, double circleSizeAngle, double startAngle, SolidColorBrush color)
         {
             //Bogen wird erstellt und der objectCanvas hinzugefügt
-            new DrawArc(startPoint, radius, circleSizeAngle, startAngle, color);
+            new DrawCircle(startPoint, radius, circleSizeAngle, startAngle, color);
            
             //addToCanvas(DrawList.Last().ThisObject);
 
             //Aktion wird der Aktionsliste hinzugefügt
             ActionList.Add(ActionType.Draw);
         }
-
-        /// <summary>
-        /// zeichnet Arc ohne Endpunktangabe
-        /// </summary>
-        /// <param name="startPoint"></param>
-        /// <param name="width"></param>
-        /// <param name="height"></param>
-        /// <param name="angle"></param>
-        /// <param name="color"></param>
-        //private void DrawArc(Point startPoint, double width, double height, double angle, SolidColorBrush color)
-        //{
-        //    //Bogen wird erstellt und der objectCanvas hinzugefügt
-        //    new DrawArc(startPoint, width, height, angle, color);
-            
-        //    //addToCanvas(DrawList.Last().ThisObject);
-
-        //    //Aktion wird der Aktionsliste hinzugefügt
-        //    ActionList.Add(ActionType.Draw);
-        //}
         #endregion
 
         #region undraw/restore
@@ -895,16 +877,17 @@ namespace _2DAG_Designer
         /// </summary>
         public void Measure()
         {
-            double width, height, angle;
-
             try
             {
                 //Breite und Höhe werden in von Pixel in cm umgerechnet
-                width   = PixelToCentimeter(DrawList.Last().Width);
-                height  = PixelToCentimeter(DrawList.Last().Height);
+                double width   = PixelToCentimeter(DrawList.Last().Width);
+                double height  = PixelToCentimeter(DrawList.Last().Height);
                 
                 // Winkel wird auf 2 Nachkommastellen gerundet
-                angle   = Math.Round(DrawList.Last().Angle, 2);
+                double angle   = Math.Round(DrawList.Last().Angle, 2);
+
+                if (angle == 360)
+                    angle = 0;
 
                 //negative Werte werden als positiv angezeigt
                 if (width < 0)
@@ -968,6 +951,15 @@ namespace _2DAG_Designer
         public static double CentimeterTopixel(double value)
         {
             return value * (DrawRowSize / 15);
+        }
+
+        /// <summary>
+        /// gibt die Distanz zwischen 2 Punkten zurück
+        /// </summary>
+        public static double DistanceBetween(Point p1, Point p2)
+        {
+            //Entfernung der Punkte wird berechnet und zurückgegeben
+            return Math.Sqrt(Math.Pow(p2.X - p1.X, 2) + Math.Pow(p2.Y - p1.Y, 2));
         }
 
         #endregion
