@@ -900,7 +900,7 @@ namespace _2DAG_Designer
                 HeightLabel.Content = "Höhe: " + (Math.Round(height, 2)) + "cm";
 
                 //der Winkel wird nur angezeigt, wenn er nicht 0 ist
-                if (DrawList.Last().Angle != 0 && DrawList.Last().Angle != 360)
+                if (angle != 0)
                 {
                     //Winkel wird im angleLabel angezeigt
                     AngleLabel.Content = "Winkel: " + angle + "°";

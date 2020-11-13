@@ -64,7 +64,6 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Arduino\ArduinoTest.cs" />
     <Compile Include="Arduino\Communication.cs" />
     <Compile Include="Arduino\Engrave\Engrave.cs" />
     <Compile Include="BurnSimulation\StepmotorMovement.cs" />

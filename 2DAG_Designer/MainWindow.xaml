@@ -261,7 +261,7 @@
                 </Border>
 
 
-                <Button x:Name="Schrittmotor" Visibility="Hidden" Content="Schrittmotor" Click="Schrittmotor_Click" Margin="0 50" />
+                <Button x:Name="Schrittmotor" Visibility="Visible" Content="Schrittmotor" Click="Schrittmotor_Click" Margin="0 50" />
             </StackPanel>
 
 
