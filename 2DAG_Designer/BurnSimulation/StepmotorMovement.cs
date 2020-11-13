@@ -1,4 +1,5 @@
 ﻿using _2DAG_Designer.DrawingObjects;
+using _2DAG_Designer.DrawingObjects.Objects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -159,7 +160,15 @@ namespace _2DAG_Designer.BurnSimulation
                 {
                     //Position werden festgelegt
                     Position.Margin = new Thickness(lines[currentObj].GetStart().X - 5, lines[currentObj].GetStart().Y - 5, 0, 0);
+                    
+                    if(lines[currentObj].GetType() == typeof(DrawLine))
+                    {
+                    }
+                    else 
+                    {
 
+                    }
+                     
                     XMovement = lines[currentObj].Width / (lines[currentObj].GetLineLength() * 2);
                     YMovement = lines[currentObj].Height / (lines[currentObj].GetLineLength() * 2);
                 }
