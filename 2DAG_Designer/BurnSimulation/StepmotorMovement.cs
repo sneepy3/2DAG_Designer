@@ -55,13 +55,19 @@ namespace _2DAG_Designer.BurnSimulation
         private const double StepDistance = 30;
 
         private static int currentObj = 0;
-
+        private static Line currentLine;
 
         private static double XMovement;
         private static double YMovement;
 
 
         private static bool calledOnce = false;
+
+
+
+        private static bool drawingCircle = false;
+        private static double radiusPerCycle = 0; 
+
 
         public static void Start(IDrawable[] drawables)
         {
@@ -77,6 +83,15 @@ namespace _2DAG_Designer.BurnSimulation
             ActualPos.Margin = new Thickness(drawables[0].GetStart().X - 5, drawables[0].GetStart().Y - 5, 0, 0);
 
             lines = drawables;
+
+            currentLine = new Line()
+            {
+                X1 = lines.First().GetStart().X,
+                Y1 = lines.First().GetStart().Y,
+
+                Y2 = lines.First().GetEnd().Y,
+                X2 = lines.First().GetEnd().X,
+            };
 
             XMovement = lines[currentObj].Width /  (lines[currentObj].GetLineLength() * 2 );
             YMovement = lines[currentObj].Height / (lines[currentObj].GetLineLength() * 2 );
@@ -120,32 +135,37 @@ namespace _2DAG_Designer.BurnSimulation
             var lineFinished = false;
 
             // wenn die Breite größer als 0 ist
-            if (lines[currentObj].Width > 0)
+            if (currentLine.GetWidth() > 0)
             {                
-                if (lines[currentObj].GetEnd().X <= Position.Margin.Left +5)
+                if (currentLine.X2 <= Position.Margin.Left +5)
                     lineFinished = true;
             }
             // wenn die Breite kleiner als 0 ist
-            else if (lines[currentObj].Width < 0)
+            else if (currentLine.GetWidth() < 0)
             {
-                if (lines[currentObj].GetEnd().X >= Position.Margin.Left +5 )
+                if (currentLine.X2 >= Position.Margin.Left +5 )
                     lineFinished = true;
             }
             //bei Linien mit Breite = 0
             else
             {
                 //bei positiver Höhe
-                if(lines[currentObj].Height > 0)
+                if(currentLine.GetHeight() > 0)
                 {
-                    if (lines[currentObj].GetEnd().Y <= Position.Margin.Top +5)
+                    if (currentLine.Y2 <= Position.Margin.Top +5)
                         lineFinished = true;
                 }
                 //bei negativer Höhe
                 else
                 {
-                    if (lines[currentObj].GetEnd().Y >= Position.Margin.Top +5)
+                    if (currentLine.Y2 >= Position.Margin.Top +5)
                         lineFinished = true;
                 }
+            }
+
+            if(drawingCircle)
+            {
+
             }
 
 
@@ -154,23 +174,38 @@ namespace _2DAG_Designer.BurnSimulation
                 //zum nächsten Objekt
                 currentObj++;
 
+                if(lines[currentObj].GetType() == typeof(DrawLine))
+                {
+                    drawingCircle = false;
+
+                   
+                }
+                else 
+                {
+                    drawingCircle = true;
+                }
+
+                currentLine = new Line()
+                {
+                    X1 = lines.First().GetStart().X,
+                    Y1 = lines.First().GetStart().Y,
+
+                    Y2 = lines.First().GetEnd().Y,
+                    X2 = lines.First().GetEnd().X,
+                };
 
                 //Wenn das Objekt existiert
-                if((lines.Length - 1 >= currentObj))
+                if ((lines.Length - 1 >= currentObj))
                 {
                     //Position werden festgelegt
                     Position.Margin = new Thickness(lines[currentObj].GetStart().X - 5, lines[currentObj].GetStart().Y - 5, 0, 0);
                     
-                    if(lines[currentObj].GetType() == typeof(DrawLine))
-                    {
-                    }
-                    else 
-                    {
-
-                    }
                      
-                    XMovement = lines[currentObj].Width / (lines[currentObj].GetLineLength() * 2);
-                    YMovement = lines[currentObj].Height / (lines[currentObj].GetLineLength() * 2);
+                    if(!drawingCircle)
+                    {
+                        XMovement = lines[currentObj].Width / (lines[currentObj].GetLineLength() * 2);
+                        YMovement = lines[currentObj].Height / (lines[currentObj].GetLineLength() * 2);
+                    }
                 }
                 else
                 {
@@ -237,6 +272,16 @@ namespace _2DAG_Designer.BurnSimulation
             return false;
         }
                                 
+
+        private static double GetHeight(this Line line)
+        {
+            return (line.Y2 - line.Y1);
+        }
+
+        private static double GetWidth(this Line line)
+        {
+            return (line.X2 - line.X1);
+        }
 
         private static double GetLineLength(this IDrawable line)
         {
