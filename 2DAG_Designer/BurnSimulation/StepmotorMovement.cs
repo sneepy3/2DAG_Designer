@@ -174,17 +174,6 @@ namespace _2DAG_Designer.BurnSimulation
                 //zum nächsten Objekt
                 currentObj++;
 
-                if(lines[currentObj].GetType() == typeof(DrawLine))
-                {
-                    drawingCircle = false;
-
-                   
-                }
-                else 
-                {
-                    drawingCircle = true;
-                }
-
                 currentLine = new Line()
                 {
                     X1 = lines.First().GetStart().X,
@@ -197,6 +186,15 @@ namespace _2DAG_Designer.BurnSimulation
                 //Wenn das Objekt existiert
                 if ((lines.Length - 1 >= currentObj))
                 {
+                    if(lines[currentObj].GetType() == typeof(DrawLine))
+                    {
+                        drawingCircle = false;                   
+                    }
+                    else 
+                    {
+                        drawingCircle = true;
+                    }
+
                     //Position werden festgelegt
                     Position.Margin = new Thickness(lines[currentObj].GetStart().X - 5, lines[currentObj].GetStart().Y - 5, 0, 0);
                     
