@@ -25,13 +25,13 @@ namespace _2DAG_Designer.DrawingObjects.Objects
         public double Radius;
 
         //Mittelpunkt des Kreises
-        private Point _centerPoint;
+        public Point CenterPoint;
 
         //Größe des Kreises (90 => 1/4 Kreis)
-        private double CircleSizeAngle;
+        public double CircleSizeAngle;
 
         //Anfangswinkel des Kreises
-        private double StartAngle;
+        public double StartAngle;
 
         #endregion
 
@@ -146,7 +146,7 @@ namespace _2DAG_Designer.DrawingObjects.Objects
             Width = Radius;
 
             //Mittelpunkt wird mit dem Startpunkt, dem Radius und dem Winkel berechnet
-            this._centerPoint = CalculatePoint(ObjectStart, Radius, centerPointAngle);
+            this.CenterPoint = CalculatePoint(ObjectStart, Radius, centerPointAngle);
 
             //der Anfangswinkel des Kreises wird aktualisiert
             StartAngle = centerPointAngle - 90;
@@ -224,7 +224,7 @@ namespace _2DAG_Designer.DrawingObjects.Objects
             var centerPointAngle = StartAngle + 90;
 
             //Mittelpunkt wird mit dem Startpunkt, dem Radius und dem Winkel berechnet
-            this._centerPoint = CalculatePoint(ObjectStart, Radius, centerPointAngle);
+            this.CenterPoint = CalculatePoint(ObjectStart, Radius, centerPointAngle);
 
             //Markierung Mittelpunkt
             //MainWindow.ThisWindow.AddToCanvas(new Ellipse() { Margin = new Thickness(_centerPoint.X - 2.5, _centerPoint.Y - 2.5, 0, 0), Width = 5, Height = 5, Fill = Brushes.Red });
@@ -237,7 +237,7 @@ namespace _2DAG_Designer.DrawingObjects.Objects
                 endPointAngle = -180.0 + (centerPointAngle + 359.999);
 
             //Berechnung des Endpunktes
-            this.ActualObjectEnd = CalculatePoint(_centerPoint, Radius, endPointAngle);
+            this.ActualObjectEnd = CalculatePoint(CenterPoint, Radius, endPointAngle);
         }
 
         /// <summary>
@@ -335,6 +335,16 @@ namespace _2DAG_Designer.DrawingObjects.Objects
 
             //string mit den Informationen des Objekts wird zurückgegeben
             return line;
+        }
+
+        /// <summary>
+        /// Länge des Kreises berechnen
+        /// </summary>
+        /// <returns></returns>
+        public double GetLength()
+        {
+            // Die Länge wird aus dem Winkel und dem Radius berechnet
+            return (this.Radius * Math.PI * this.CircleSizeAngle) / 180;
         }
     }
 }
