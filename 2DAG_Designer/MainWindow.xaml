@@ -68,7 +68,7 @@
             </Setter>
         </Style>
 
-        <Style x:Key="DrawAreaStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource fontStyle}">
+        <Style x:Key="NoTriggerButtonStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource fontStyle}">
             <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
             <Setter Property="Background" Value="#C0F0F0"/>
             <Setter Property="BorderBrush" Value="Transparent"/>
@@ -83,11 +83,6 @@
                         <Border x:Name="border" CornerRadius="5" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="true">
                             <ContentPresenter x:Name="contentPresenter" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
                         </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="true" />
-
-                            <Trigger Property="IsPressed" Value="true" />
-                        </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
@@ -225,12 +220,12 @@
 
 
             <!--Vor und Zurück Buttons-->
-            <Button x:Name="Reverse" Height="40" Width="40" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center" Margin="-40,0,0,0" Click="Reverse_Click" BorderBrush="{x:Null}"  >
+            <Button x:Name="Reverse" Style="{StaticResource NoTriggerButtonStyle}" Height="40" Width="40" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center" Margin="-40,0,0,0" Click="Reverse_Click" BorderBrush="{x:Null}"  >
                 <Button.Background>
                     <ImageBrush ImageSource="Resources\reverseButton.png"/>
                 </Button.Background>
             </Button>
-            <Button x:Name="Redo" Height="40" Width="40" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="40,0,0,0"  Click="Redo_Click" BorderBrush="{x:Null}" >
+            <Button x:Name="Redo" Style="{StaticResource NoTriggerButtonStyle}" Height="40" Width="40" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="40,0,0,0"  Click="Redo_Click" BorderBrush="{x:Null}" >
                 <Button.Background>
                     <ImageBrush ImageSource="Resources\redoButton.png" TileMode="Tile"/>
                 </Button.Background>
@@ -239,11 +234,12 @@
 
             <!--StackPanel für die Steuerung auf der linken Seite-->
             <StackPanel  Grid.Row="2" HorizontalAlignment="Center" >
+                
                 <!--Arduino-->
                 <Border 
                     Margin="0 10"
                     Width="186">
-
+                    
                     <StackPanel>
                         <Button x:Name="SearchPortsButton" Content="Ports suchen" Click="SearchPortsButton_Click" Margin="10" />
                         <Label x:Name="ComLabel" Content="Port auswählen" IsEnabled="False" Visibility="Visible" />
@@ -260,8 +256,74 @@
                     </StackPanel>
                 </Border>
 
-
                 <Button x:Name="Schrittmotor" Visibility="Visible" Content="Schrittmotor" Click="Schrittmotor_Click" Margin="0 50" />
+
+                <!--verschieben-->
+                <Border>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+
+                        <Button x:Name="MoveTop" Style="{StaticResource NoTriggerButtonStyle}"  Height="50" Width="50" Grid.Row="0" Grid.ColumnSpan="2"  Margin="10 10" Click="MoveTop_Click">
+                            <Button.Background>
+                                <ImageBrush ImageSource="Resources\arrow.png">
+                                    <ImageBrush.RelativeTransform>
+                                        <TransformGroup>
+                                            <ScaleTransform CenterY="0.5" CenterX="0.5"/>
+                                            <SkewTransform CenterY="0.5" CenterX="0.5"/>
+                                            <RotateTransform Angle="-90" CenterY="0.5" CenterX="0.5"/>
+                                            <TranslateTransform/>
+                                        </TransformGroup>
+                                    </ImageBrush.RelativeTransform>
+                                </ImageBrush>
+                            </Button.Background>
+                        </Button>
+
+                        <Button x:Name="MoveLeft" Style="{StaticResource NoTriggerButtonStyle}" Height="50" Width="50" Grid.Row="1" Margin="10 10" Click="MoveLeft_Click">
+                            <Button.Background>
+                                <ImageBrush ImageSource="Resources\arrow.png">
+                                    <ImageBrush.RelativeTransform>
+                                        <TransformGroup>
+                                            <ScaleTransform CenterY="0.5" CenterX="0.5"/>
+                                            <SkewTransform CenterY="0.5" CenterX="0.5"/>
+                                            <RotateTransform Angle="-180" CenterY="0.5" CenterX="0.5"/>
+                                            <TranslateTransform/>
+                                        </TransformGroup>
+                                    </ImageBrush.RelativeTransform>
+                                </ImageBrush>
+                            </Button.Background>
+                        </Button>
+
+                        <Button x:Name="MoveRight"  Height="50" Width="50" Style="{StaticResource NoTriggerButtonStyle}" Grid.Column="1" Grid.Row="1" Margin="10 10" Click="MoveRight_Click">
+                            <Button.Background>
+                                <ImageBrush ImageSource="Resources\arrow.png" />                            
+                            </Button.Background>
+                        </Button>
+
+                        <Button x:Name="MoveBottom" Height="50" Width="50" Style="{StaticResource NoTriggerButtonStyle}" Grid.Row="2" Grid.ColumnSpan="2" Margin="10 10" Click="MoveBottom_Click">
+                            <Button.Background>
+                                <ImageBrush ImageSource="Resources\arrow.png">
+                                    <ImageBrush.RelativeTransform>
+                                        <TransformGroup>
+                                            <ScaleTransform CenterY="0.5" CenterX="0.5"/>
+                                            <SkewTransform CenterY="0.5" CenterX="0.5"/>
+                                            <RotateTransform Angle="90" CenterY="0.5" CenterX="0.5"/>
+                                            <TranslateTransform/>
+                                        </TransformGroup>
+                                    </ImageBrush.RelativeTransform>
+                                </ImageBrush>
+                            </Button.Background>
+                        </Button>
+                    </Grid>
+                </Border>
             </StackPanel>
 
 
@@ -269,7 +331,7 @@
             <Button x:Name="DrawArea"  
                     Grid.Column="1" Grid.Row="2" 
                     Click="DrawArea_Click"  
-                    Style="{StaticResource DrawAreaStyle}"
+                    Style="{StaticResource NoTriggerButtonStyle}"
                     Opacity="0.2"/>
 
             <!--Canvas für die cm Bezeichnungen-->
@@ -362,8 +424,6 @@
             </StackPanel>
 
 
-            <!--Kreis, der den Fortschritt beim Gravierforgang anzeigt-->
-            <Ellipse x:Name="ProgressCircle" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Top" Width="10" Height="10" Fill="Red" Visibility="Hidden" />
 
         </Grid>
 

@@ -247,6 +247,34 @@ namespace _2DAG_Designer
 
         #endregion
 
+        #region Bewegen
+
+        private void MoveTop_Click(object sender, RoutedEventArgs e)
+        {
+            //um einen Millimeter verschieben
+            Edit.EditDraw(DrawList.Last(), Edit.EditType.EndUp);
+        }
+
+        private void MoveLeft_Click(object sender, RoutedEventArgs e)
+        {
+            //um einen Millimeter verschieben
+            Edit.EditDraw(DrawList.Last(), Edit.EditType.EndLeft);
+        }
+
+        private void MoveRight_Click(object sender, RoutedEventArgs e)
+        {
+            //um einen Millimeter verschieben
+            Edit.EditDraw(DrawList.Last(), Edit.EditType.EndRight);
+        }
+
+        private void MoveBottom_Click(object sender, RoutedEventArgs e)
+        {
+            //um einen Millimeter verschieben
+            Edit.EditDraw(DrawList.Last(), Edit.EditType.EndDown);
+        }
+
+        #endregion
+
         // Eventhandler für den Zeichenbereich
         private void DrawArea_Click(object sender, RoutedEventArgs e)
         {
@@ -468,7 +496,7 @@ namespace _2DAG_Designer
                     //nach oben verschieben
                      if (Keyboard.IsKeyDown(Key.NumPad8))
                     {
-                        //um 4 Pixel verschoben
+                        //um einen Millimeter verschieben
                         Edit.EditDraw(DrawList.Last(), Edit.EditType.EndUp);
 
                         anyActionTriggered = true;
@@ -477,7 +505,7 @@ namespace _2DAG_Designer
                     // nach unten verschieben
                     if (Keyboard.IsKeyDown(Key.NumPad2))
                     {
-                        //um 4 Pixel verschoben
+                        //um einen Millimeter verschieben
                         Edit.EditDraw(DrawList.Last(), Edit.EditType.EndDown);
 
                         anyActionTriggered = true;
@@ -486,7 +514,7 @@ namespace _2DAG_Designer
                     // nach links verschieben
                     if (Keyboard.IsKeyDown(Key.NumPad4))
                     {
-                        //um 4 Pixel verschoben
+                        //um einen Millimeter verschieben
                         Edit.EditDraw(DrawList.Last(), Edit.EditType.EndLeft);
 
                         anyActionTriggered = true;
@@ -495,7 +523,7 @@ namespace _2DAG_Designer
                     // nach rechts verschieben
                     if (Keyboard.IsKeyDown(Key.NumPad6))
                     {
-                        //um 4 Pixel verschoben
+                        //um einen Millimeter verschieben
                         Edit.EditDraw(DrawList.Last(), Edit.EditType.EndRight);
 
                         anyActionTriggered = true;
