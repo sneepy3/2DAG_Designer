@@ -124,6 +124,12 @@ namespace _2DAG_Designer.BurnSimulation
                 MotorY.Margin = new Thickness(MotorY.Margin.Left, Position.Margin.Top, 0, 0);
             }
 
+            // bei einem Kreis muss die X und Y Bewegung berechnet werden
+            if(drawingCircle)
+            {
+
+            }
+
             //Position die sich aus den 2 Schrittmotoren ergibt
             ActualPos.Margin = new Thickness(MotorX.Margin.Left, MotorY.Margin.Top, 0, 0);
 
@@ -163,11 +169,6 @@ namespace _2DAG_Designer.BurnSimulation
                 }
             }
 
-            if(drawingCircle)
-            {
-
-            }
-
 
             if(lineFinished)
             {
@@ -185,20 +186,35 @@ namespace _2DAG_Designer.BurnSimulation
 
                 //Wenn das Objekt existiert
                 if ((lines.Length - 1 >= currentObj))
-                {
+                     {
+                    // wenn das nächste Objekt eine Linie ist
                     if(lines[currentObj].GetType() == typeof(DrawLine))
                     {
-                        drawingCircle = false;                   
+                        drawingCircle = false;
+
+                        // neue Linie, die eingebrannt werden soll, wird gespeichert
+                        currentLine = new Line()
+                        {
+                            X1 = lines[currentObj].GetStart().X,
+                            Y1 = lines[currentObj].GetStart().Y,
+
+                            Y2 = lines[currentObj].GetEnd().Y,
+                            X2 = lines[currentObj].GetEnd().X,
+                        };
                     }
-                    else 
-                    {
+                    // wenn es sich um einen Kreis handelt
+                    else if(lines[currentObj].GetType() == typeof(DrawCircle)) 
+                    {rkölewjrökwqe
                         drawingCircle = true;
+
+
                     }
 
                     //Position werden festgelegt
                     Position.Margin = new Thickness(lines[currentObj].GetStart().X - 5, lines[currentObj].GetStart().Y - 5, 0, 0);
                     
-                     
+                    // bei Linien bleibt die Geschwindigkeit der X und Y Achse bis zum Ende der Linie gleich
+                    // bei einem Kreis muss sie immer neu berechnet werden 
                     if(!drawingCircle)
                     {
                         XMovement = lines[currentObj].Width / (lines[currentObj].GetLineLength() * 2);
