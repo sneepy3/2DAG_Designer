@@ -466,7 +466,7 @@ namespace _2DAG_Designer
                 if(DrawList.Count > 0)
                 {
                     //nach oben verschieben
-                    if (Keyboard.IsKeyDown(Key.NumPad8))
+                     if (Keyboard.IsKeyDown(Key.NumPad8))
                     {
                         //um 4 Pixel verschoben
                         Edit.EditDraw(DrawList.Last(), Edit.EditType.EndUp);
