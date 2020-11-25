@@ -85,20 +85,67 @@ namespace _2DAG_Designer.BurnSimulation
 
             lines = drawables;
 
-            currentLine = new Line()
+
+            // wenn das erste Objekt eine Linie ist
+            if (lines[currentObj].GetType() == typeof(DrawLine))
             {
-                X1 = lines.First().GetStart().X,
-                Y1 = lines.First().GetStart().Y,
+                drawingCircle = false;
 
-                Y2 = lines.First().GetEnd().Y,
-                X2 = lines.First().GetEnd().X,
-            };
+                // neue Linie, die eingebrannt werden soll, wird gespeichert
+                currentLine = new Line()
+                {
+                    X1 = lines[currentObj].GetStart().X,
+                    Y1 = lines[currentObj].GetStart().Y,
 
-            XMovement = lines[currentObj].Width /  (lines[currentObj].GetLineLength() * 2 );
-            YMovement = lines[currentObj].Height / (lines[currentObj].GetLineLength() * 2 );
+                    Y2 = lines[currentObj].GetEnd().Y,
+                    X2 = lines[currentObj].GetEnd().X,
+                };
+
+                //Position wird festgelegt
+                Position.Margin = new Thickness(lines[currentObj].GetStart().X - 5, lines[currentObj].GetStart().Y - 5, 0, 0);
+
+                // bei Linien bleibt die Geschwindigkeit der X und Y Achse bis zum Ende der Linie gleich
+                XMovement = lines[currentObj].Width / (lines[currentObj].GetLineLength() * 2);
+                YMovement = lines[currentObj].Height / (lines[currentObj].GetLineLength() * 2);
+            }
+            // wenn es sich um einen Kreis handelt
+            else if (lines[currentObj].GetType() == typeof(DrawCircle))
+            {
+                drawingCircle = true;
+
+                // Kreis wird abgespeichert
+                var circle = (DrawCircle)lines[currentObj];
+
+                // Kreis wird als Vieleck gezeichnet
+                // Winkel pro Ecke
+                anglePerVertex = circle.CircleSizeAngle / (circle.GetLength() / 10);
+
+                // Mit dem Anfangswinkel des Kreises wird begonnen
+                currentAngle = circle.StartAngle - 90;
+
+                // Startpunkt der Linie
+                var startPoint = circle.GetStart();
+
+                // Endpunkt der Linie
+                var lineEnd = CalculatePoint(circle.CenterPoint, circle.Radius, currentAngle + anglePerVertex);
+
+                currentLine = new Line()
+                {
+                    X1 = startPoint.X,
+                    Y1 = startPoint.Y,
+
+                    X2 = lineEnd.X,
+                    Y2 = lineEnd.Y
+                };
+
+                // bei einem Kreis muss die Bewegung immer neu berechnet werden 
+                XMovement = currentLine.GetWidth() / (currentLine.GetLineLength() * 2);
+                YMovement = currentLine.GetHeight() / (currentLine.GetLineLength() * 2);
+            }
+
 
             //wird nur beim ersten mal ausgeführt
-            if(!calledOnce)
+            if (!calledOnce)
             {
                 //Timer für die ständige Aktualisierung der Positionen
                 Timer.Tick += new EventHandler(Cycle);
@@ -210,15 +257,6 @@ namespace _2DAG_Designer.BurnSimulation
                 {
                     //zum nächsten Objekt
                     currentObj++;
-
-                    currentLine = new Line()
-                    {
-                        X1 = lines.First().GetStart().X,
-                        Y1 = lines.First().GetStart().Y,
-
-                        Y2 = lines.First().GetEnd().Y,
-                        X2 = lines.First().GetEnd().X,
-                    };
 
                     //Wenn das Objekt existiert
                     if ((lines.Length - 1 >= currentObj))
