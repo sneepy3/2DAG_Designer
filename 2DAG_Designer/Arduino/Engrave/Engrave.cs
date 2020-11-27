@@ -97,7 +97,7 @@ namespace _2DAG_Designer.Arduino.Engrave
             var yDistance = Math.Round(MainWindow.PixelToCentimeter(drawable.Height), 5);
 
 
-            var returnString = $"#OBJ{xDistance}/{yDistance}";
+            var returnString = $"#OBJL{xDistance}/{yDistance}";
 
             returnString = returnString.Replace(",", ".");
 
