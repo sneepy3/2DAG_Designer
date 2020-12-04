@@ -116,9 +116,11 @@ namespace _2DAG_Designer.BurnSimulation
                 // Kreis wird abgespeichert
                 var circle = (DrawCircle)lines[currentObj];
 
-                // Kreis wird als Vieleck gezeichnet
+                // Kreis wird als Vieleck gezeichnet 
                 // Winkel pro Ecke
-                anglePerVertex = circle.CircleSizeAngle / (circle.GetLength() / 10);
+                var length = MainWindow.PixelToCentimeter(circle.GetLength());
+
+                anglePerVertex = circle.CircleSizeAngle / (length * 10);
 
                 // Mit dem Anfangswinkel des Kreises wird begonnen
                 currentAngle = circle.StartAngle - 90;

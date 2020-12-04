@@ -33,6 +33,9 @@ namespace _2DAG_Designer.DrawingObjects.Objects
         //Anfangswinkel des Kreises
         public double StartAngle;
 
+        //gibt an, ob der Kreis invertiert ist (nach oben geht)
+        public bool IsInverted;
+
         #endregion
 
         #region Constructor
@@ -40,7 +43,7 @@ namespace _2DAG_Designer.DrawingObjects.Objects
         /// <summary>
         /// Constructor
         /// </summary>
-        public DrawCircle(Point startPoint, double radius, double circleSizeAngle,  double startAngle,
+        public DrawCircle(Point startPoint, double radius, double circleSizeAngle,  double startAngle, bool inverted,
             SolidColorBrush color)
         {
             #region Werte abspeichern
@@ -60,6 +63,9 @@ namespace _2DAG_Designer.DrawingObjects.Objects
 
             //Größe des Kreises
             this.CircleSizeAngle = circleSizeAngle;
+
+            //Invertierung
+            this.IsInverted = inverted;
 
             //Die größe des Kreises, darf nicht größer als 360 sein
             if(circleSizeAngle > 360)
