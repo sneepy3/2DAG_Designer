@@ -70,30 +70,27 @@ namespace _2DAG_Designer.DrawingObjects.Objects
         /// </summary>
         public override void Redraw()
         {
-            //vom Canvas entfernen
-            MainWindow.ThisWindow.RemoveFromCanvas(ThisObject);
+            var thisObject = (Line)ThisObject;
+            //Linie von X1, Y1
+            thisObject.X1 = ObjectStart.X;
+            thisObject.Y1 = ObjectStart.Y;
 
-            //neue Linie wir erstellt
-            ThisObject = new Line()
-            {
-                //Linie von X1, Y1
-                X1 = ObjectStart.X,
-                Y1 = ObjectStart.Y,
+            //zu X2, Y2
+            thisObject.X2 = ActualObjectEnd.X;
+            thisObject.Y2 = ActualObjectEnd.Y;
 
-                //zu X2, Y2
-                X2 = ActualObjectEnd.X,
-                Y2 = ActualObjectEnd.Y,
+            //Farbe der Linie wird festgelegt
+            thisObject.Stroke = Color;   
+            
+            // Dicke: 2
+            thisObject.StrokeThickness = 2;   
 
-                Stroke = Color,         //Farbe der Linie wird festgelegt
-                StrokeThickness = 2     // Dicke: 2
-            };
+            //Änderungen werden gespeichert
+            ThisObject = thisObject;
 
             GetMeasures();
 
             GetAngle();
-
-            //zum Canvas hinzufügen
-            MainWindow.ThisWindow.AddToCanvas(ThisObject);
         }
 
         public override void Rotate(double angle)

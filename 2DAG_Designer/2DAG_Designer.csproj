@@ -64,7 +64,6 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Arduino\ArduinoTest.cs" />
     <Compile Include="Arduino\Communication.cs" />
     <Compile Include="Arduino\Engrave\Engrave.cs" />
     <Compile Include="BurnSimulation\StepmotorMovement.cs" />
@@ -73,7 +72,7 @@
     <Compile Include="DrawingObjects\Groups\DrawWord.cs" />
     <Compile Include="DrawingObjects\Edit\Edit.cs" />
     <Compile Include="DrawingObjects\IDrawable.cs" />
-    <Compile Include="DrawingObjects\Objects\DrawArc.cs" />
+    <Compile Include="DrawingObjects\Objects\DrawCircle.cs" />
     <Compile Include="DrawingObjects\Objects\DrawEllipse.cs" />
     <Compile Include="DrawingObjects\Objects\DrawLine.cs" />
     <Compile Include="FileIO\DrawFile.cs" />
@@ -123,6 +122,9 @@
   <ItemGroup>
     <Resource Include="Resources\openfile.png" />
     <Resource Include="Resources\save.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\arrow.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -45,14 +45,11 @@ namespace _2DAG_Designer.Arduino.Engrave
 
             foreach (var drawable in drawables)
             {
-                if(drawable.GetType() == typeof(DrawLine))
+                if (drawable.GetType() != typeof(DrawEllipse))
                 {
+
                     //Information der Linie wird gesendet
-                    Send(drawable.GetLineInformation());
-                }
-                else
-                {
-                    //Andere Objektarten noch nich implementiert
+                    Send(drawable.GetObjectInformation());                
                 }
             }
 
@@ -88,21 +85,46 @@ namespace _2DAG_Designer.Arduino.Engrave
         /// <summary>
         /// Informationen zum Senden für eine Linie
         /// </summary>
-        private static string GetLineInformation(this IDrawable drawable)
+        private static string GetObjectInformation(this IDrawable drawable)
         {
-            //Distanz Start-Ende in X Richtung
-            var xDistance = Math.Round(MainWindow.PixelToCentimeter(drawable.Width), 5);
+            if (drawable.GetType() == typeof(DrawLine))
+            {
+                //Distanz Start-Ende in X Richtung
+                var xDistance = Math.Round(MainWindow.PixelToCentimeter(drawable.Width), 5);
 
-            //Distanz Start-Ende in Y Richtung
-            var yDistance = Math.Round(MainWindow.PixelToCentimeter(drawable.Height), 5);
+                //Distanz Start-Ende in Y Richtung
+                var yDistance = Math.Round(MainWindow.PixelToCentimeter(drawable.Height), 5);
 
 
-            var returnString = $"#OBJ{xDistance}/{yDistance}";
+                var returnString = $"#OBJL{xDistance}/{yDistance}";
 
-            returnString = returnString.Replace(",", ".");
+                returnString = returnString.Replace(",", ".");
 
-            //Information wird zurückgegeben
-            return returnString;
+                //Information wird zurückgegeben
+                return returnString;
+            }
+            else if (drawable.GetType() == typeof(DrawCircle))
+            {
+                var circle = (DrawCircle)drawable;
+
+                //Radius in cm
+                var radius = Math.Round(MainWindow.PixelToCentimeter(circle.Radius), 5);
+
+                //Größe
+                var circleSizeAngle = Math.Round(circle.CircleSizeAngle, 5);
+
+                //erster Winkel
+                var firstAngle = Math.Round(circle.StartAngle - 90, 5);
+
+                var returnString = $"#OBJC{radius}/{circleSizeAngle}/{firstAngle}";
+
+                returnString = returnString.Replace(",", ".");
+
+                //Informationen werden zurückgegeben
+                return returnString;
+            }
+            else
+                return null;
         }
 
         /// <summary>

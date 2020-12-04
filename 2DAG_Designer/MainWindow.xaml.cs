@@ -247,6 +247,34 @@ namespace _2DAG_Designer
 
         #endregion
 
+        #region Bewegen
+
+        private void MoveTop_Click(object sender, RoutedEventArgs e)
+        {
+            //um einen Millimeter verschieben
+            Edit.EditDraw(DrawList.Last(), Edit.EditType.EndUp);
+        }
+
+        private void MoveLeft_Click(object sender, RoutedEventArgs e)
+        {
+            //um einen Millimeter verschieben
+            Edit.EditDraw(DrawList.Last(), Edit.EditType.EndLeft);
+        }
+
+        private void MoveRight_Click(object sender, RoutedEventArgs e)
+        {
+            //um einen Millimeter verschieben
+            Edit.EditDraw(DrawList.Last(), Edit.EditType.EndRight);
+        }
+
+        private void MoveBottom_Click(object sender, RoutedEventArgs e)
+        {
+            //um einen Millimeter verschieben
+            Edit.EditDraw(DrawList.Last(), Edit.EditType.EndDown);
+        }
+
+        #endregion
+
         // Eventhandler für den Zeichenbereich
         private void DrawArea_Click(object sender, RoutedEventArgs e)
         {
@@ -286,9 +314,9 @@ namespace _2DAG_Designer
                     if(DrawLines)
                         // die Linie wird gezeichnet in schwarz
                         DrawLine(newShapeStart, newShapeEnd, Brushes.Black);
-                    else
+                    //else
                         //Bogen wird in schwarz gezeichnet
-                        DrawArc(newShapeStart, newShapeEnd, Brushes.Black);
+                        //DrawArc(newShapeStart, newShapeEnd, Brushes.Black);
 
                     //drawArc(drawList.Last().GetStart(),
                     //       100, 100, 0, Brushes.Black);
@@ -300,21 +328,16 @@ namespace _2DAG_Designer
         }
 
         private void CreateArcButton_Click(object sender, RoutedEventArgs e)
-        {
-            //Werte aus den Textboxen
-            double widthText;
-            double heightText;
-            double angleText;
-
+        {         
             try
             {
                 //Werte aus den Textboxen werden abgespeichert
-                widthText = Convert.ToDouble(WidthTextBox.Text);
-                heightText = Convert.ToDouble(HeightTextBox.Text);
-                angleText = Convert.ToDouble(AngleTextBox.Text);
+                double radius = Convert.ToDouble(RadiusTextBox.Text);
+                double circleSizeAngle = Convert.ToDouble(CircleSizeTextBox.Text);
 
-                //die Breite und Höhe müssen größer sein als 0
-                if((widthText <= 0) || (heightText <= 0))
+
+                //der Radius und die Größe des Kreises müssen positiv sein
+                if((circleSizeAngle <= 0) || (radius <= 0))
                 {
                     throw new Exception("");
                 }
@@ -322,12 +345,11 @@ namespace _2DAG_Designer
                 //Wenn die Konvertierung nicht funktioniert, wird der folgende Teil automatisch übersprungen
 
                 //Umrechnung von cm in Pixel
-                widthText   *= (DrawRowSize / 15);
-                heightText  *= (DrawRowSize / 15);
-                    
-                //der Bogen wird gezeichnet
-                DrawArc(DrawList.Last().GetEnd(),
-                        widthText, heightText, angleText, Brushes.Black);
+                radius = CentimeterTopixel(radius);
+
+                //der Kreis wird gezeichnet
+                DrawCircle(DrawList.Last().GetEnd(),
+                        radius, circleSizeAngle, DrawList.Last().Angle, Brushes.Black);
 
                 //wenn alles funktioniert hat, bleibt die Umrandung des Buttons schwarz
                 CreateArcButton.BorderBrush = Brushes.Gray;
@@ -472,9 +494,9 @@ namespace _2DAG_Designer
                 if(DrawList.Count > 0)
                 {
                     //nach oben verschieben
-                    if (Keyboard.IsKeyDown(Key.NumPad8))
+                     if (Keyboard.IsKeyDown(Key.NumPad8))
                     {
-                        //um 4 Pixel verschoben
+                        //um einen Millimeter verschieben
                         Edit.EditDraw(DrawList.Last(), Edit.EditType.EndUp);
 
                         anyActionTriggered = true;
@@ -483,7 +505,7 @@ namespace _2DAG_Designer
                     // nach unten verschieben
                     if (Keyboard.IsKeyDown(Key.NumPad2))
                     {
-                        //um 4 Pixel verschoben
+                        //um einen Millimeter verschieben
                         Edit.EditDraw(DrawList.Last(), Edit.EditType.EndDown);
 
                         anyActionTriggered = true;
@@ -492,7 +514,7 @@ namespace _2DAG_Designer
                     // nach links verschieben
                     if (Keyboard.IsKeyDown(Key.NumPad4))
                     {
-                        //um 4 Pixel verschoben
+                        //um einen Millimeter verschieben
                         Edit.EditDraw(DrawList.Last(), Edit.EditType.EndLeft);
 
                         anyActionTriggered = true;
@@ -501,7 +523,7 @@ namespace _2DAG_Designer
                     // nach rechts verschieben
                     if (Keyboard.IsKeyDown(Key.NumPad6))
                     {
-                        //um 4 Pixel verschoben
+                        //um einen Millimeter verschieben
                         Edit.EditDraw(DrawList.Last(), Edit.EditType.EndRight);
 
                         anyActionTriggered = true;
@@ -567,6 +589,7 @@ namespace _2DAG_Designer
         #region Helper
 
         #region drawing
+
         /// <summary>
         /// zeichnet eine Line vom Start zum Endpunkt   
         /// </summary>
@@ -590,30 +613,11 @@ namespace _2DAG_Designer
         /// <param name="height"></param>
         /// <param name="angle"></param>
         /// <param name="color"></param>
-        private void DrawArc(Point startPoint, Point endPoint, SolidColorBrush color)
+        private void DrawCircle(Point startPoint,double radius, double circleSizeAngle, double startAngle, SolidColorBrush color)
         {
             //Bogen wird erstellt und der objectCanvas hinzugefügt
-            new DrawArc(startPoint, endPoint, color, true);
+            new DrawCircle(startPoint, radius, circleSizeAngle, startAngle, color);
            
-            //addToCanvas(DrawList.Last().ThisObject);
-
-            //Aktion wird der Aktionsliste hinzugefügt
-            ActionList.Add(ActionType.Draw);
-        }
-
-        /// <summary>
-        /// zeichnet Arc ohne Endpunktangabe
-        /// </summary>
-        /// <param name="startPoint"></param>
-        /// <param name="width"></param>
-        /// <param name="height"></param>
-        /// <param name="angle"></param>
-        /// <param name="color"></param>
-        private void DrawArc(Point startPoint, double width, double height, double angle, SolidColorBrush color)
-        {
-            //Bogen wird erstellt und der objectCanvas hinzugefügt
-            new DrawArc(startPoint, width, height, angle, color);
-            
             //addToCanvas(DrawList.Last().ThisObject);
 
             //Aktion wird der Aktionsliste hinzugefügt
@@ -901,16 +905,17 @@ namespace _2DAG_Designer
         /// </summary>
         public void Measure()
         {
-            double width, height, angle;
-
             try
             {
                 //Breite und Höhe werden in von Pixel in cm umgerechnet
-                width   = PixelToCentimeter(DrawList.Last().Width);
-                height  = PixelToCentimeter(DrawList.Last().Height);
+                double width   = PixelToCentimeter(DrawList.Last().Width);
+                double height  = PixelToCentimeter(DrawList.Last().Height);
                 
                 // Winkel wird auf 2 Nachkommastellen gerundet
-                angle   = Math.Round(DrawList.Last().Angle, 2);
+                double angle   = Math.Round(DrawList.Last().Angle, 2);
+
+                if (angle == 360)
+                    angle = 0;
 
                 //negative Werte werden als positiv angezeigt
                 if (width < 0)
@@ -923,7 +928,7 @@ namespace _2DAG_Designer
                 HeightLabel.Content = "Höhe: " + (Math.Round(height, 2)) + "cm";
 
                 //der Winkel wird nur angezeigt, wenn er nicht 0 ist
-                if (DrawList.Last().Angle != 0 && DrawList.Last().Angle != 360)
+                if (angle != 0)
                 {
                     //Winkel wird im angleLabel angezeigt
                     AngleLabel.Content = "Winkel: " + angle + "°";
@@ -974,6 +979,15 @@ namespace _2DAG_Designer
         public static double CentimeterTopixel(double value)
         {
             return value * (DrawRowSize / 15);
+        }
+
+        /// <summary>
+        /// gibt die Distanz zwischen 2 Punkten zurück
+        /// </summary>
+        public static double DistanceBetween(Point p1, Point p2)
+        {
+            //Entfernung der Punkte wird berechnet und zurückgegeben
+            return Math.Sqrt(Math.Pow(p2.X - p1.X, 2) + Math.Pow(p2.Y - p1.Y, 2));
         }
 
         #endregion

@@ -1,4 +1,5 @@
 ﻿using _2DAG_Designer.DrawingObjects;
+using _2DAG_Designer.DrawingObjects.Objects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -54,13 +55,20 @@ namespace _2DAG_Designer.BurnSimulation
         private const double StepDistance = 30;
 
         private static int currentObj = 0;
-
+        private static Line currentLine;
 
         private static double XMovement;
         private static double YMovement;
 
 
         private static bool calledOnce = false;
+
+
+
+        private static bool drawingCircle = false;
+        private static double anglePerVertex = 0;
+        private static double currentAngle;
+
 
         public static void Start(IDrawable[] drawables)
         {
@@ -77,11 +85,67 @@ namespace _2DAG_Designer.BurnSimulation
 
             lines = drawables;
 
-            XMovement = lines[currentObj].Width /  (lines[currentObj].GetLineLength() * 2 );
-            YMovement = lines[currentObj].Height / (lines[currentObj].GetLineLength() * 2 );
+
+            // wenn das erste Objekt eine Linie ist
+            if (lines[currentObj].GetType() == typeof(DrawLine))
+            {
+                drawingCircle = false;
+
+                // neue Linie, die eingebrannt werden soll, wird gespeichert
+                currentLine = new Line()
+                {
+                    X1 = lines[currentObj].GetStart().X,
+                    Y1 = lines[currentObj].GetStart().Y,
+
+                    Y2 = lines[currentObj].GetEnd().Y,
+                    X2 = lines[currentObj].GetEnd().X,
+                };
+
+                //Position wird festgelegt
+                Position.Margin = new Thickness(lines[currentObj].GetStart().X - 5, lines[currentObj].GetStart().Y - 5, 0, 0);
+
+                // bei Linien bleibt die Geschwindigkeit der X und Y Achse bis zum Ende der Linie gleich
+                XMovement = lines[currentObj].Width / (lines[currentObj].GetLineLength() * 2);
+                YMovement = lines[currentObj].Height / (lines[currentObj].GetLineLength() * 2);
+            }
+            // wenn es sich um einen Kreis handelt
+            else if (lines[currentObj].GetType() == typeof(DrawCircle))
+            {
+                drawingCircle = true;
+
+                // Kreis wird abgespeichert
+                var circle = (DrawCircle)lines[currentObj];
+
+                // Kreis wird als Vieleck gezeichnet
+                // Winkel pro Ecke
+                anglePerVertex = circle.CircleSizeAngle / (circle.GetLength() / 10);
+
+                // Mit dem Anfangswinkel des Kreises wird begonnen
+                currentAngle = circle.StartAngle - 90;
+
+                // Startpunkt der Linie
+                var startPoint = circle.GetStart();
+
+                // Endpunkt der Linie
+                var lineEnd = CalculatePoint(circle.CenterPoint, circle.Radius, currentAngle, currentAngle + anglePerVertex);
+
+                currentLine = new Line()
+                {
+                    X1 = startPoint.X,
+                    Y1 = startPoint.Y,
+
+                    X2 = lineEnd.X,
+                    Y2 = lineEnd.Y
+                };
+
+                // bei einem Kreis muss die Bewegung immer neu berechnet werden 
+                XMovement = currentLine.GetWidth() / (currentLine.GetLineLength() * 2);
+                YMovement = currentLine.GetHeight() / (currentLine.GetLineLength() * 2);
+            }
+
 
             //wird nur beim ersten mal ausgeführt
-            if(!calledOnce)
+            if (!calledOnce)
             {
                 //Timer für die ständige Aktualisierung der Positionen
                 Timer.Tick += new EventHandler(Cycle);
@@ -99,7 +163,7 @@ namespace _2DAG_Designer.BurnSimulation
             //Wenn ein Schritt in X Richtung ausgeführt werden soll
             if (StepX())
             {
-                MotorX.Margin = new Thickness(Position.Margin.Left, MotorX.Margin.Top, 0, 0);               
+                MotorX.Margin = new Thickness(Position.Margin.Left, MotorX.Margin.Top, 0, 0);
             }
 
             //Wenn ein Schritt in Y Richtung ausgeführt werden soll
@@ -119,61 +183,153 @@ namespace _2DAG_Designer.BurnSimulation
             var lineFinished = false;
 
             // wenn die Breite größer als 0 ist
-            if (lines[currentObj].Width > 0)
-            {                
-                if (lines[currentObj].GetEnd().X <= Position.Margin.Left +5)
+            if (currentLine.GetWidth() > 0)
+            {
+                if (currentLine.X2 <= Position.Margin.Left + 5)
                     lineFinished = true;
             }
             // wenn die Breite kleiner als 0 ist
-            else if (lines[currentObj].Width < 0)
+            else if (currentLine.GetWidth() < 0)
             {
-                if (lines[currentObj].GetEnd().X >= Position.Margin.Left +5 )
+                if (currentLine.X2 >= Position.Margin.Left + 5)
                     lineFinished = true;
             }
             //bei Linien mit Breite = 0
             else
             {
                 //bei positiver Höhe
-                if(lines[currentObj].Height > 0)
+                if (currentLine.GetHeight() > 0)
                 {
-                    if (lines[currentObj].GetEnd().Y <= Position.Margin.Top +5)
+                    if (currentLine.Y2 <= Position.Margin.Top + 5)
                         lineFinished = true;
                 }
                 //bei negativer Höhe
                 else
                 {
-                    if (lines[currentObj].GetEnd().Y >= Position.Margin.Top +5)
+                    if (currentLine.Y2 >= Position.Margin.Top + 5)
                         lineFinished = true;
                 }
             }
 
 
-            if(lineFinished)
+            if (lineFinished)
             {
-                //zum nächsten Objekt
-                currentObj++;
+                bool drawNextObject = true;
 
-
-                //Wenn das Objekt existiert
-                if((lines.Length - 1 >= currentObj))
+                // bei einem Kreis muss die X und Y Bewegung berechnet werden,
+                // wenn der Kreis noch nicht beendet ist
+                if (drawingCircle)
                 {
-                    //Position werden festgelegt
-                    Position.Margin = new Thickness(lines[currentObj].GetStart().X - 5, lines[currentObj].GetStart().Y - 5, 0, 0);
+                    // Kreis wird abgespeichert
+                    var circle = (DrawCircle)lines[currentObj];
 
-                    XMovement = lines[currentObj].Width / (lines[currentObj].GetLineLength() * 2);
-                    YMovement = lines[currentObj].Height / (lines[currentObj].GetLineLength() * 2);
+                    // neuer Winkel wird berechnet
+                    currentAngle += anglePerVertex;
+
+
+                    // Wenn der Kreis noch nicht beendet ist,
+                    if (currentAngle < (circle.StartAngle - 90 + circle.CircleSizeAngle))
+                    {
+                        // nächstes Objekt soll nicht gezeichnet werden, da der Kreis noch nicht beendet ist
+                        drawNextObject = false;
+
+                        var startPoint = new Point(currentLine.X2, currentLine.Y2);
+
+                        var endPoint = CalculatePoint(circle.CenterPoint, circle.Radius, currentAngle, currentAngle + anglePerVertex);
+
+                        // neue Linie zum nächsten Eckpunkt
+                        currentLine = new Line()
+                        {
+                            X1 = startPoint.X,
+                            Y1 = startPoint.Y,
+
+                            X2 = endPoint.X,
+                            Y2 = endPoint.Y
+                        };
+
+                        XMovement = currentLine.GetWidth() / (currentLine.GetLineLength() * 2);
+                        YMovement = currentLine.GetHeight() / (currentLine.GetLineLength() * 2);
+                    }
                 }
-                else
+
+                // Wenn das nächste Objekt gezeichnet werden soll
+                if (drawNextObject)
                 {
-                    Timer.Stop();
+                    //zum nächsten Objekt
+                    currentObj++;
 
-                    //Kreise werden entfernt
-                    MainWindow.ThisWindow.DrawField.Children.Remove(Position);
-                    MainWindow.ThisWindow.DrawField.Children.Remove(MotorX);
-                    MainWindow.ThisWindow.DrawField.Children.Remove(MotorY);
-                    MainWindow.ThisWindow.DrawField.Children.Remove(ActualPos);
+                    //Wenn das Objekt existiert
+                    if ((lines.Length - 1 >= currentObj))
+                    {
+                        // wenn das nächste Objekt eine Linie ist
+                        if (lines[currentObj].GetType() == typeof(DrawLine))
+                        {
+                            drawingCircle = false;
 
-                    currentObj = 0;
+                            // neue Linie, die eingebrannt werden soll, wird gespeichert
+                            currentLine = new Line()
+                            {
+                                X1 = lines[currentObj].GetStart().X,
+                                Y1 = lines[currentObj].GetStart().Y,
+
+                                Y2 = lines[currentObj].GetEnd().Y,
+                                X2 = lines[currentObj].GetEnd().X,
+                            };
+
+                            //Position wird festgelegt
+                            Position.Margin = new Thickness(lines[currentObj].GetStart().X - 5, lines[currentObj].GetStart().Y - 5, 0, 0);
+
+                            // bei Linien bleibt die Geschwindigkeit der X und Y Achse bis zum Ende der Linie gleich
+                            XMovement = lines[currentObj].Width / (lines[currentObj].GetLineLength() * 2);
+                            YMovement = lines[currentObj].Height / (lines[currentObj].GetLineLength() * 2);
+                        }
+                        // wenn es sich um einen Kreis handelt
+                        else if (lines[currentObj].GetType() == typeof(DrawCircle))
+                        {
+                            drawingCircle = true;
+
+                            // Kreis wird abgespeichert
+                            var circle = (DrawCircle)lines[currentObj];
+
+                            // Kreis wird als Vieleck gezeichnet
+                            // Winkel pro Ecke
+                            anglePerVertex = circle.CircleSizeAngle / (circle.GetLength() / 10);
+
+                            // Mit dem Anfangswinkel des Kreises wird begonnen
+                            currentAngle = circle.StartAngle - 90;
+
+                            // Startpunkt der Linie
+                            var startPoint = circle.GetStart();
+
+                            // Endpunkt der Linie
+                            var lineEnd = CalculatePoint(circle.CenterPoint, circle.Radius, currentAngle, currentAngle + anglePerVertex);
+
+                            currentLine = new Line()
+                            {
+                                X1 = startPoint.X,
+                                Y1 = startPoint.Y,
+
+                                X2 = lineEnd.X,
+                                Y2 = lineEnd.Y
+                            };
+
+                            // bei einem Kreis muss die Bewegung immer neu berechnet werden 
+                            XMovement = currentLine.GetWidth() / (currentLine.GetLineLength() * 2);
+                            YMovement = currentLine.GetHeight() / (currentLine.GetLineLength() * 2);
+                        }
+                    }
+                    else
+                    {
+                        Timer.Stop();
+
+                        //Kreise werden entfernt
+                        MainWindow.ThisWindow.DrawField.Children.Remove(Position);
+                        MainWindow.ThisWindow.DrawField.Children.Remove(MotorX);
+                        MainWindow.ThisWindow.DrawField.Children.Remove(MotorY);
+                        MainWindow.ThisWindow.DrawField.Children.Remove(ActualPos);
+
+                        currentObj = 0;
+                    }
                 }
 
             }
@@ -183,11 +339,11 @@ namespace _2DAG_Designer.BurnSimulation
         private static bool StepX()
         {
             // wenn die Distanz 0 ist, soll kein Schritt ausgeführt werden
-            if (lines[currentObj].Width == 0)
+            if (currentLine.GetWidth() == 0)
                 return false;
 
             // Wenn die Distanz positiv ist
-            if (lines[currentObj].Width > 0)
+            if (currentLine.GetWidth() > 0)
             {
                 //Wenn die Position die Distanz erreicht, soll ein Schritt ausgeführt werden
                 if ((ActualPos.Margin.Left + StepDistance) <= Position.Margin.Left)
@@ -207,11 +363,11 @@ namespace _2DAG_Designer.BurnSimulation
         private static bool StepY()
         {
             // wenn die Distanz 0 ist, soll kein Schritt ausgeführt werden
-            if (lines[currentObj].Height == 0)
+            if (currentLine.GetHeight() == 0)
                 return false;
 
             // Wenn die Distanz positiv ist
-            if (lines[currentObj].Height > 0)
+            if (currentLine.GetHeight() > 0)
             {
                 //Wenn die Position die Distanz erreicht, soll ein Schritt ausgeführt werden
                 if ((ActualPos.Margin.Top + StepDistance) <= Position.Margin.Top)
@@ -227,11 +383,53 @@ namespace _2DAG_Designer.BurnSimulation
 
             return false;
         }
-                                
+
+
+        private static double GetHeight(this Line line)
+        {
+            return (line.Y2 - line.Y1);
+        }
+
+        private static double GetWidth(this Line line)
+        {
+            return (line.X2 - line.X1);
+        }
 
         private static double GetLineLength(this IDrawable line)
         {
             return Math.Sqrt(Math.Pow(line.Width, 2) + Math.Pow(line.Height, 2));
+        }
+
+        private static double GetLineLength(this Line line)
+        {
+            return Math.Sqrt(Math.Pow(line.GetWidth(), 2) + Math.Pow(line.GetHeight(), 2));
+        }
+
+        /// <summary>
+        /// Berechnet Punkt anhand eines anderen Punkts,
+        /// dem Abstand und dem Winkel
+        /// </summary>
+        /// <param name="startPoint"></param>
+        /// <param name="disctance"></param>
+        /// <param name="angle"></param>
+        /// <returns></returns>
+        private static Point CalculatePoint(Point startPoint, double disctance, double lastAngle, double nextAngle)
+        {
+            var X1 = Math.Cos(lastAngle * (Math.PI / 180.0)) * disctance;
+            var Y1 = Math.Sin(lastAngle * (Math.PI / 180.0)) * disctance;
+
+            var X2 = Math.Cos(nextAngle * (Math.PI / 180.0)) * disctance;
+            var Y2 = Math.Sin(nextAngle * (Math.PI / 180.0)) * disctance;
+
+            var width = X2 - X1;
+
+            var height = Y2 - Y1;
+
+            return new Point()
+            {
+                X = startPoint.X + (Math.Cos(lastAngle * (Math.PI / 180.0)) * disctance) + width,
+                Y = startPoint.Y + (Math.Sin(lastAngle * (Math.PI / 180.0)) * disctance) + height
+            };
         }
     }
 }
