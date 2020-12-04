@@ -127,7 +127,7 @@ namespace _2DAG_Designer.BurnSimulation
                 var startPoint = circle.GetStart();
 
                 // Endpunkt der Linie
-                var lineEnd = CalculatePoint(circle.CenterPoint, circle.Radius, currentAngle + anglePerVertex);
+                var lineEnd = CalculatePoint(circle.CenterPoint, circle.Radius, currentAngle, currentAngle + anglePerVertex);
 
                 currentLine = new Line()
                 {
@@ -163,7 +163,7 @@ namespace _2DAG_Designer.BurnSimulation
             //Wenn ein Schritt in X Richtung ausgeführt werden soll
             if (StepX())
             {
-                MotorX.Margin = new Thickness(Position.Margin.Left, MotorX.Margin.Top, 0, 0);               
+                MotorX.Margin = new Thickness(Position.Margin.Left, MotorX.Margin.Top, 0, 0);
             }
 
             //Wenn ein Schritt in Y Richtung ausgeführt werden soll
@@ -171,7 +171,7 @@ namespace _2DAG_Designer.BurnSimulation
             {
                 MotorY.Margin = new Thickness(MotorY.Margin.Left, Position.Margin.Top, 0, 0);
             }
-                   
+
             //Position die sich aus den 2 Schrittmotoren ergibt
             ActualPos.Margin = new Thickness(MotorX.Margin.Left, MotorY.Margin.Top, 0, 0);
 
@@ -184,35 +184,35 @@ namespace _2DAG_Designer.BurnSimulation
 
             // wenn die Breite größer als 0 ist
             if (currentLine.GetWidth() > 0)
-            {                
-                if (currentLine.X2 <= Position.Margin.Left +5)
+            {
+                if (currentLine.X2 <= Position.Margin.Left + 5)
                     lineFinished = true;
             }
             // wenn die Breite kleiner als 0 ist
             else if (currentLine.GetWidth() < 0)
             {
-                if (currentLine.X2 >= Position.Margin.Left +5 )
+                if (currentLine.X2 >= Position.Margin.Left + 5)
                     lineFinished = true;
             }
             //bei Linien mit Breite = 0
             else
             {
                 //bei positiver Höhe
-                if(currentLine.GetHeight() > 0)
+                if (currentLine.GetHeight() > 0)
                 {
-                    if (currentLine.Y2 <= Position.Margin.Top +5)
+                    if (currentLine.Y2 <= Position.Margin.Top + 5)
                         lineFinished = true;
                 }
                 //bei negativer Höhe
                 else
                 {
-                    if (currentLine.Y2 >= Position.Margin.Top +5)
+                    if (currentLine.Y2 >= Position.Margin.Top + 5)
                         lineFinished = true;
                 }
             }
 
 
-            if(lineFinished)
+            if (lineFinished)
             {
                 bool drawNextObject = true;
 
@@ -235,8 +235,8 @@ namespace _2DAG_Designer.BurnSimulation
 
                         var startPoint = new Point(currentLine.X2, currentLine.Y2);
 
-                        var endPoint = CalculatePoint(circle.CenterPoint, circle.Radius, currentAngle + anglePerVertex);
-                     
+                        var endPoint = CalculatePoint(circle.CenterPoint, circle.Radius, currentAngle, currentAngle + anglePerVertex);
+
                         // neue Linie zum nächsten Eckpunkt
                         currentLine = new Line()
                         {
@@ -253,16 +253,16 @@ namespace _2DAG_Designer.BurnSimulation
                 }
 
                 // Wenn das nächste Objekt gezeichnet werden soll
-                if(drawNextObject)
+                if (drawNextObject)
                 {
                     //zum nächsten Objekt
                     currentObj++;
 
                     //Wenn das Objekt existiert
                     if ((lines.Length - 1 >= currentObj))
-                         {
+                    {
                         // wenn das nächste Objekt eine Linie ist
-                        if(lines[currentObj].GetType() == typeof(DrawLine))
+                        if (lines[currentObj].GetType() == typeof(DrawLine))
                         {
                             drawingCircle = false;
 
@@ -284,7 +284,7 @@ namespace _2DAG_Designer.BurnSimulation
                             YMovement = lines[currentObj].Height / (lines[currentObj].GetLineLength() * 2);
                         }
                         // wenn es sich um einen Kreis handelt
-                        else if(lines[currentObj].GetType() == typeof(DrawCircle)) 
+                        else if (lines[currentObj].GetType() == typeof(DrawCircle))
                         {
                             drawingCircle = true;
 
@@ -302,7 +302,7 @@ namespace _2DAG_Designer.BurnSimulation
                             var startPoint = circle.GetStart();
 
                             // Endpunkt der Linie
-                            var lineEnd = CalculatePoint(circle.CenterPoint, circle.Radius, currentAngle + anglePerVertex);
+                            var lineEnd = CalculatePoint(circle.CenterPoint, circle.Radius, currentAngle, currentAngle + anglePerVertex);
 
                             currentLine = new Line()
                             {
@@ -319,17 +319,17 @@ namespace _2DAG_Designer.BurnSimulation
                         }
                     }
                     else
-                {
-                    Timer.Stop();
+                    {
+                        Timer.Stop();
 
-                    //Kreise werden entfernt
-                    MainWindow.ThisWindow.DrawField.Children.Remove(Position);
-                    MainWindow.ThisWindow.DrawField.Children.Remove(MotorX);
-                    MainWindow.ThisWindow.DrawField.Children.Remove(MotorY);
-                    MainWindow.ThisWindow.DrawField.Children.Remove(ActualPos);
+                        //Kreise werden entfernt
+                        MainWindow.ThisWindow.DrawField.Children.Remove(Position);
+                        MainWindow.ThisWindow.DrawField.Children.Remove(MotorX);
+                        MainWindow.ThisWindow.DrawField.Children.Remove(MotorY);
+                        MainWindow.ThisWindow.DrawField.Children.Remove(ActualPos);
 
-                    currentObj = 0;
-                }
+                        currentObj = 0;
+                    }
                 }
 
             }
@@ -383,7 +383,7 @@ namespace _2DAG_Designer.BurnSimulation
 
             return false;
         }
-                                
+
 
         private static double GetHeight(this Line line)
         {
@@ -413,12 +413,22 @@ namespace _2DAG_Designer.BurnSimulation
         /// <param name="disctance"></param>
         /// <param name="angle"></param>
         /// <returns></returns>
-        private static Point CalculatePoint(Point startPoint, double disctance, double angle)
+        private static Point CalculatePoint(Point startPoint, double disctance, double lastAngle, double nextAngle)
         {
+            var X1 = Math.Cos(lastAngle * (Math.PI / 180.0)) * disctance;
+            var Y1 = Math.Sin(lastAngle * (Math.PI / 180.0)) * disctance;
+
+            var X2 = Math.Cos(nextAngle * (Math.PI / 180.0)) * disctance;
+            var Y2 = Math.Sin(nextAngle * (Math.PI / 180.0)) * disctance;
+
+            var width = X2 - X1;
+
+            var height = Y2 - Y1;
+
             return new Point()
             {
-                X = startPoint.X + (Math.Cos(angle * (Math.PI / 180.0)) * disctance),
-                Y = startPoint.Y + (Math.Sin(angle * (Math.PI / 180.0)) * disctance)
+                X = startPoint.X + (Math.Cos(lastAngle * (Math.PI / 180.0)) * disctance) + width,
+                Y = startPoint.Y + (Math.Sin(lastAngle * (Math.PI / 180.0)) * disctance) + height
             };
         }
     }
