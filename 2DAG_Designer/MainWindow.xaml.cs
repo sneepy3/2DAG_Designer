@@ -349,7 +349,7 @@ namespace _2DAG_Designer
 
                 //der Kreis wird gezeichnet
                 DrawCircle(DrawList.Last().GetEnd(),
-                        radius, circleSizeAngle, DrawList.Last().Angle, Brushes.Black);
+                        radius, circleSizeAngle, DrawList.Last().Angle, CircleInvertedCheckBox.IsChecked.Value);
 
                 //wenn alles funktioniert hat, bleibt die Umrandung des Buttons schwarz
                 CreateArcButton.BorderBrush = Brushes.Gray;
@@ -613,10 +613,10 @@ namespace _2DAG_Designer
         /// <param name="height"></param>
         /// <param name="angle"></param>
         /// <param name="color"></param>
-        private void DrawCircle(Point startPoint,double radius, double circleSizeAngle, double startAngle, SolidColorBrush color)
+        private void DrawCircle(Point startPoint,double radius, double circleSizeAngle, double startAngle, bool inverted)
         {
             //Bogen wird erstellt und der objectCanvas hinzugefügt
-            new DrawCircle(startPoint, radius, circleSizeAngle, startAngle, color);
+            new DrawCircle(startPoint, radius, circleSizeAngle, startAngle, inverted, Brushes.Black);
            
             //addToCanvas(DrawList.Last().ThisObject);
 
@@ -1154,7 +1154,6 @@ namespace _2DAG_Designer
                 Application.Current.MainWindow.Width = WindowWidth;
             }
         }
-
 
         #endregion
         //-------------------------------------------------

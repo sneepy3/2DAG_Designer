@@ -103,17 +103,32 @@ namespace _2DAG_Designer.DrawingObjects.Objects
         {
             //Winkel für die Berechnung des Mittelpunkts
             //Mittelpunkt ist vom Startpunkt aus um Startwinkel + 90 Grad verschoben
-            var centerPointAngle = StartAngle + 90; 
-          
+            var centerPointAngle = StartAngle + 90;
+
+            // Wenn der Kreis gegen den Uhrzeigersinn geht,
+            if (IsInverted)
+                centerPointAngle = StartAngle - 90;
+
+
+
             //Winkel vom Mittel zum Endpunkt wird berechnet
             var endPointAngle = -180.0 + (centerPointAngle + CircleSizeAngle);
+
+            if (IsInverted)
+                endPointAngle += 180;
 
             //Berechnung des Winkels am Ende des Kreises
             this.Angle = 90 + endPointAngle;
 
+            if (IsInverted)
+                this.Angle = endPointAngle - 90;
+
             //Wenn der Winkel größer als 360 ist, wird 360 abgezogen, kein visueller Effekt
             if (Angle >= 360)
                 Angle -= 360;
+            // Wenn er kleiner als 0 ist, wird 360 addiert
+            else if (Angle <= 0)
+                Angle += 360;
         }
 
         public override void Redraw()
@@ -229,21 +244,31 @@ namespace _2DAG_Designer.DrawingObjects.Objects
             //Mittelpunkt ist vom Startpunkt aus um Startwinkel + 90 Grad verschoben
             var centerPointAngle = StartAngle + 90;
 
+            // Wenn der Kreis gegen den Uhrzeigersinn geht,
+            if (IsInverted)
+                centerPointAngle = StartAngle - 90;
+
             //Mittelpunkt wird mit dem Startpunkt, dem Radius und dem Winkel berechnet
             this.CenterPoint = CalculatePoint(ObjectStart, Radius, centerPointAngle);
 
             //Markierung Mittelpunkt
             //MainWindow.ThisWindow.AddToCanvas(new Ellipse() { Margin = new Thickness(_centerPoint.X - 2.5, _centerPoint.Y - 2.5, 0, 0), Width = 5, Height = 5, Fill = Brushes.Red });
-
-            //Winkel vom Mittel zum Endpunkt wird berechnet
-            var endPointAngle = -180.0 + (centerPointAngle + CircleSizeAngle);
             
             //Die größe des Kreises, darf nicht 360 betragen, sonst wird nichts angezeigt
             if (CircleSizeAngle == 360)
-                endPointAngle = -180.0 + (centerPointAngle + 359.999);
+                CircleSizeAngle = 359.999;
+
+            //Winkel vom Mittel zum Endpunkt wird berechnet
+            var endPointAngle = -180.0 + (centerPointAngle + CircleSizeAngle);
+
+            if (IsInverted)
+                endPointAngle += 180;
+
 
             //Berechnung des Endpunktes
             this.ActualObjectEnd = CalculatePoint(CenterPoint, Radius, endPointAngle);
+
+            MainWindow.ThisWindow.AddToCanvas(new Ellipse() { Margin = new Thickness(ActualObjectEnd.X - 2.5, ActualObjectEnd.Y - 2.5, 0, 0), Width = 5, Height = 5, Fill = Brushes.Red });
         }
 
         /// <summary>
@@ -291,13 +316,19 @@ namespace _2DAG_Designer.DrawingObjects.Objects
             // bei einem Winkel von mehr als 180 Grad, soll die größere Seite genommen werden
             bool isLargeArc = CircleSizeAngle > 180;
 
+            // Richtung der Kreiszeichnung
+            var sweepDirection = SweepDirection.Clockwise;
+
+            if (IsInverted)
+                sweepDirection = SweepDirection.Counterclockwise;
+
             //Der PathFigure wird ein ArcSegment hinzugefügt
             //es beihaltet den gewünschten Kreisanteil
             pf.Segments.Add(new ArcSegment()
             {
                 Size = new Size(this.Radius, this.Radius),
                 Point = this.ActualObjectEnd,
-                SweepDirection = SweepDirection.Clockwise,
+                SweepDirection = sweepDirection,
                 IsLargeArc = isLargeArc
             });
 
