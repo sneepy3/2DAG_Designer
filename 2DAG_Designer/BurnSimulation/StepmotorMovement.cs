@@ -120,10 +120,20 @@ namespace _2DAG_Designer.BurnSimulation
                 // Winkel pro Ecke
                 var length = MainWindow.PixelToCentimeter(circle.GetLength());
 
-                anglePerVertex = circle.CircleSizeAngle / (length * 10);
+                anglePerVertex = circle.CircleSizeAngle / Math.Round(length * 10);
 
                 // Mit dem Anfangswinkel des Kreises wird begonnen
                 currentAngle = circle.StartAngle - 90;
+
+                // bei einem invertiertem Kreis
+                if (circle.IsInverted)
+                {
+                    // Winkel pro Eckpunkt muss negativ sein
+                    anglePerVertex = -anglePerVertex;
+
+                    // Startwinkel in andere Richtung
+                    currentAngle = circle.StartAngle + 90;
+                }
 
                 // Startpunkt der Linie
                 var startPoint = circle.GetStart();
@@ -228,9 +238,21 @@ namespace _2DAG_Designer.BurnSimulation
                     // neuer Winkel wird berechnet
                     currentAngle += anglePerVertex;
 
+                    bool circleNotFinished;
+
+                    // Wenn der Kreis invertiert ist
+                    if(circle.IsInverted)
+                    {
+                        circleNotFinished = currentAngle > (circle.StartAngle + 90.0001 - circle.CircleSizeAngle);
+                    }
+                    // Wenn der Kreis nicht invertiert ist
+                    else
+                    {
+                        circleNotFinished = currentAngle < (circle.StartAngle - 90.0001 + circle.CircleSizeAngle);
+                    }
 
                     // Wenn der Kreis noch nicht beendet ist,
-                    if (currentAngle < (circle.StartAngle - 90 + circle.CircleSizeAngle))
+                    if(circleNotFinished)
                     {
                         // nächstes Objekt soll nicht gezeichnet werden, da der Kreis noch nicht beendet ist
                         drawNextObject = false;
@@ -300,6 +322,16 @@ namespace _2DAG_Designer.BurnSimulation
                             // Mit dem Anfangswinkel des Kreises wird begonnen
                             currentAngle = circle.StartAngle - 90;
 
+                            // bei einem invertiertem Kreis
+                            if (circle.IsInverted)
+                            {
+                                // Winkel pro Eckpunkt muss negativ sein
+                                anglePerVertex = -anglePerVertex;
+
+                                // Startwinkel in andere Richtung
+                                currentAngle = circle.StartAngle + 90;
+                            }
+
                             // Startpunkt der Linie
                             var startPoint = circle.GetStart();
 
@@ -314,6 +346,9 @@ namespace _2DAG_Designer.BurnSimulation
                                 X2 = lineEnd.X,
                                 Y2 = lineEnd.Y
                             };
+
+                            //Position wird festgelegt
+                            Position.Margin = new Thickness(lines[currentObj].GetStart().X - 5, lines[currentObj].GetStart().Y - 5, 0, 0);
 
                             // bei einem Kreis muss die Bewegung immer neu berechnet werden 
                             XMovement = currentLine.GetWidth() / (currentLine.GetLineLength() * 2);

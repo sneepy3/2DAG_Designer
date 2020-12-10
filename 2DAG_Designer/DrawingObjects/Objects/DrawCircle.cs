@@ -115,7 +115,7 @@ namespace _2DAG_Designer.DrawingObjects.Objects
             var endPointAngle = -180.0 + (centerPointAngle + CircleSizeAngle);
 
             if (IsInverted)
-                endPointAngle += 180;
+                endPointAngle = 180.0 + (centerPointAngle - CircleSizeAngle);
 
             //Berechnung des Winkels am Ende des Kreises
             this.Angle = 90 + endPointAngle;
@@ -262,13 +262,11 @@ namespace _2DAG_Designer.DrawingObjects.Objects
             var endPointAngle = -180.0 + (centerPointAngle + CircleSizeAngle);
 
             if (IsInverted)
-                endPointAngle += 180;
+                endPointAngle = 180.0 + (centerPointAngle - CircleSizeAngle);
 
 
             //Berechnung des Endpunktes
             this.ActualObjectEnd = CalculatePoint(CenterPoint, Radius, endPointAngle);
-
-            MainWindow.ThisWindow.AddToCanvas(new Ellipse() { Margin = new Thickness(ActualObjectEnd.X - 2.5, ActualObjectEnd.Y - 2.5, 0, 0), Width = 5, Height = 5, Fill = Brushes.Red });
         }
 
         /// <summary>

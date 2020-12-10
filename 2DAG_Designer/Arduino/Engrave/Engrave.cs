@@ -95,32 +95,38 @@ namespace _2DAG_Designer.Arduino.Engrave
                 //Distanz Start-Ende in Y Richtung
                 var yDistance = Math.Round(MainWindow.PixelToCentimeter(drawable.Height), 5);
 
-
+                // string der gesendet werden soll
                 var returnString = $"#OBJL{xDistance}/{yDistance}";
 
+                // Kommas werden durch Punkte ersetzt
                 returnString = returnString.Replace(",", ".");
 
-                //Information wird zurückgegeben
+                // Information wird zurückgegeben
                 return returnString;
             }
             else if (drawable.GetType() == typeof(DrawCircle))
             {
                 var circle = (DrawCircle)drawable;
 
-                //Radius in cm
+                // Radius in cm
                 var radius = Math.Round(MainWindow.PixelToCentimeter(circle.Radius), 5);
 
-                //Größe
+                // Größe
                 var circleSizeAngle = Math.Round(circle.CircleSizeAngle, 5);
 
-                //erster Winkel
+                // erster Winkel
                 var firstAngle = Math.Round(circle.StartAngle - 90, 5);
 
-                var returnString = $"#OBJC{radius}/{circleSizeAngle}/{firstAngle}";
+                // Invertierung wird als 1 oder 0 übertragen 
+                int isInverted = circle.IsInverted ? 1:0;
 
+                // string der gesendet werden soll
+                var returnString = $"#OBJC{radius}/{circleSizeAngle}/{firstAngle}/{isInverted}";
+
+                // Kommas werden durch Punkte ersetzt
                 returnString = returnString.Replace(",", ".");
 
-                //Informationen werden zurückgegeben
+                // Informationen werden zurückgegeben
                 return returnString;
             }
             else
