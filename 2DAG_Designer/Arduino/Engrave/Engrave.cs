@@ -117,6 +117,11 @@ namespace _2DAG_Designer.Arduino.Engrave
                 // erster Winkel
                 var firstAngle = Math.Round(circle.StartAngle - 90, 5);
 
+                if(circle.IsInverted)
+                {
+                    firstAngle = Math.Round(circle.StartAngle + 90, 5);
+                }
+
                 // Invertierung wird als 1 oder 0 übertragen 
                 int isInverted = circle.IsInverted ? 1:0;
 
