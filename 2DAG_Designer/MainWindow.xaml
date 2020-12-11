@@ -375,9 +375,12 @@
                         <Label Height="23" Width="120" Content="Radius"  />
                         <TextBox x:Name="RadiusTextBox" Text=""  Height="23" Width="120" TextWrapping="Wrap"  HorizontalAlignment="Center" VerticalAlignment="Top" />
 
-                        <Label  Height="23" Width="120" Content="Winkel" Margin="0,0,0,0" />
+                        <Label  Height="23" Width="120" Content="Größe (in Grad)" Margin="0,0,0,0" />
                         <TextBox x:Name="CircleSizeTextBox" Text="" Height="23" Width="120" TextWrapping="Wrap"  HorizontalAlignment="Center" VerticalAlignment="Top"  />
 
+                        <Label  Height="23" Width="120" Content="Rotation (in Grad)" Margin="0,0,0,0" />
+                        <TextBox x:Name="StartAngleTextBox" Text="" Height="23" Width="120" TextWrapping="Wrap"  HorizontalAlignment="Center" VerticalAlignment="Top"  />
+                        
                         <CheckBox x:Name="CircleInvertedCheckBox" Content="nach oben" HorizontalAlignment="Center" Margin="0 10" />
 
                         <Button x:Name="CreateArcButton" Content="erstellen" Margin="0 5" Width="70" Click="CreateArcButton_Click"/>
