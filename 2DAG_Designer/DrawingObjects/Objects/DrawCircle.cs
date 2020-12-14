@@ -349,26 +349,29 @@ namespace _2DAG_Designer.DrawingObjects.Objects
         {
             var line = new string[1];
 
-            //Objekt Typ
+            // Objekt Typ
             line[0] += ObjectInformation.objectType.InformationToString(ObjectTypes.Arc);
 
-            //Endpunkt
+            // Endpunkt
             line[0] += ObjectInformation.endX.InformationToString(MainWindow.PixelToCentimeter(GetEnd().X));
             line[0] += ObjectInformation.endY.InformationToString(MainWindow.PixelToCentimeter(GetEnd().Y));
 
-            //Farbe
+            // Farbe
             line[0] += ObjectInformation.color.InformationToString(Color);
 
-            //Winkel                                                     
-            line[0] += ObjectInformation.angle.InformationToString(Angle);
+            // CircleSizeAngle
+            line[0] += ObjectInformation.circleSizeAngle.InformationToString(CircleSizeAngle);
 
-            //Breite und Höhe                                            
-            line[0] += ObjectInformation.width.InformationToString(Width);
-            line[0] += ObjectInformation.height.InformationToString(Height);
+            // StartAngle
+            line[0] += ObjectInformation.startAngle.InformationToString(StartAngle);
 
-            
+            // Radius
+            line[0] += ObjectInformation.radius.InformationToString(Radius);
 
-            //string mit den Informationen des Objekts wird zurückgegeben
+            // Invertierung
+            line[0] += ObjectInformation.inverted.InformationToString(IsInverted);
+
+            // string mit den Informationen des Objekts wird zurückgegeben
             return line;
         }
 
