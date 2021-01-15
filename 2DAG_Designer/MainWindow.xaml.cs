@@ -453,9 +453,16 @@ namespace _2DAG_Designer
                 //Umrechnung von cm in Pixel
                 radius = CentimeterTopixel(radius);
 
+                double startAngle;
+
+                if (StartAngleTextBox.Text != String.Empty)
+                    startAngle = Convert.ToDouble(StartAngleTextBox.Text);
+                else
+                    startAngle = DrawList.Last().Angle;
+
                 //der Kreis wird gezeichnet
                 DrawCircle(DrawList.Last().GetEnd(),
-                        radius, circleSizeAngle, DrawList.Last().Angle, CircleInvertedCheckBox.IsChecked.Value);
+                        radius, circleSizeAngle, startAngle, CircleInvertedCheckBox.IsChecked.Value);
 
                 //wenn alles funktioniert hat, bleibt die Umrandung des Buttons schwarz
                 CreateArcButton.BorderBrush = Brushes.Gray;

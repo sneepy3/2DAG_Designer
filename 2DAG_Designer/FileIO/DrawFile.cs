@@ -35,7 +35,9 @@ namespace _2DAG_Designer.FileIO
             width,
             height,
 
-            keepHeight,
+            radius,
+            circleSizeAngle,
+            startAngle,
             inverted
         }
 
@@ -201,8 +203,7 @@ namespace _2DAG_Designer.FileIO
             }
 
             //bool
-            else if ((informationType == ObjectInformation.keepHeight) ||
-                (informationType == ObjectInformation.inverted))
+            else if (informationType == ObjectInformation.inverted)
             {
                 return "false";
             }
