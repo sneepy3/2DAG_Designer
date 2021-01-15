@@ -78,6 +78,9 @@ namespace _2DAG_Designer
 
         #endregion
 
+        // gibt den Momentan ausgewählten Punkt an
+        public static int SelectedPointIndex;
+
         private string _currentFilePath = "";
 
         //Fenstergröße
@@ -249,28 +252,131 @@ namespace _2DAG_Designer
 
         #region Bewegen
 
+        private void PreviousPointButton_Click(object sender, RoutedEventArgs e)
+        {
+            // vorheriger Punkt wird ausgewählt
+            SelectedPointIndex -= 1;
+
+            // wenn der Index kleiner 0 ist,
+            if (SelectedPointIndex < 0)
+                SelectedPointIndex = 0;
+
+            // Markierung des ausgewählten Punkts
+            SelectedPointBorder.Visibility = Visibility.Visible;
+
+            // Position der Markierung ist das Ende des entsprechenden Objekts
+            var position = DrawList[SelectedPointIndex].GetEnd();
+            SelectedPointBorder.Margin = new Thickness(position.X - 5, position.Y - 5, 0, 0);
+
+            // Markierung in den Vordergrund
+            DrawField.Children.Remove(SelectedPointBorder);
+            DrawField.Children.Add(SelectedPointBorder);
+        }
+
+        private void NextPointButton_Click(object sender, RoutedEventArgs e)
+        {
+            // nächster Punkt wird ausgewählt
+            SelectedPointIndex += 1;
+
+            // wenn der Index im auserhalb des Bereichs liegt,
+            if (SelectedPointIndex > DrawList.Count - 1)
+                SelectedPointIndex = DrawList.Count - 1;
+
+            // Markierung des ausgewählten Punkts
+            SelectedPointBorder.Visibility = Visibility.Visible;
+
+            // Position der Markierung ist das Ende des entsprechenden Objekts
+            var position = DrawList[SelectedPointIndex].GetEnd();
+            SelectedPointBorder.Margin = new Thickness(position.X - 5, position.Y - 5, 0, 0);
+
+            // Markierung in den Vordergrund
+            DrawField.Children.Remove(SelectedPointBorder);
+            DrawField.Children.Add(SelectedPointBorder);
+        }
+
         private void MoveTop_Click(object sender, RoutedEventArgs e)
         {
             //um einen Millimeter verschieben
-            Edit.EditDraw(DrawList.Last(), Edit.EditType.EndUp);
+            Edit.EditDraw(DrawList[SelectedPointIndex], Edit.EditType.EndUp);
+
+            // Wenn es sich nicht um das Letzte Objekt handelt, 
+            // muss der Startpunkt des nächsten Objekts angeglichen werden
+            if(SelectedPointIndex < DrawList.Count - 1)
+            {
+                // Endpunkt des ausgewählten Objekts ist Startpunkt des nächsten Objekts
+                DrawList[SelectedPointIndex + 1].SetStart(DrawList[SelectedPointIndex].GetEnd());
+                DrawList[SelectedPointIndex + 1].Redraw();
+            }
+
+            // Position der Markierung ist das Ende des entsprechenden Objekts
+            var position = DrawList[SelectedPointIndex].GetEnd();
+            SelectedPointBorder.Margin = new Thickness(position.X - 5, position.Y - 5, 0, 0);
         }
 
         private void MoveLeft_Click(object sender, RoutedEventArgs e)
         {
             //um einen Millimeter verschieben
-            Edit.EditDraw(DrawList.Last(), Edit.EditType.EndLeft);
+            Edit.EditDraw(DrawList[SelectedPointIndex], Edit.EditType.EndLeft);
+
+            // Wenn es sich nicht um das Letzte Objekt handelt, 
+            // muss der Startpunkt des nächsten Objekts angeglichen werden
+            if (SelectedPointIndex < DrawList.Count - 1)
+            {
+                // Endpunkt des ausgewählten Objekts ist Startpunkt des nächsten Objekts
+                DrawList[SelectedPointIndex + 1].SetStart(DrawList[SelectedPointIndex].GetEnd());
+                DrawList[SelectedPointIndex + 1].Redraw();
+            }
+
+            // Markierung des ausgewählten Punkts
+            SelectedPointBorder.Visibility = Visibility.Visible;
+
+            // Position der Markierung ist das Ende des entsprechenden Objekts
+            var position = DrawList[SelectedPointIndex].GetEnd();
+            SelectedPointBorder.Margin = new Thickness(position.X - 5, position.Y - 5, 0, 0);
         }
 
         private void MoveRight_Click(object sender, RoutedEventArgs e)
         {
             //um einen Millimeter verschieben
-            Edit.EditDraw(DrawList.Last(), Edit.EditType.EndRight);
+            Edit.EditDraw(DrawList[SelectedPointIndex], Edit.EditType.EndRight);
+
+            // Wenn es sich nicht um das Letzte Objekt handelt, 
+            // muss der Startpunkt des nächsten Objekts angeglichen werden
+            if (SelectedPointIndex < DrawList.Count - 1)
+            {
+                // Endpunkt des ausgewählten Objekts ist Startpunkt des nächsten Objekts
+                DrawList[SelectedPointIndex + 1].SetStart(DrawList[SelectedPointIndex].GetEnd());
+                DrawList[SelectedPointIndex + 1].Redraw();
+            }
+
+            // Markierung des ausgewählten Punkts
+            SelectedPointBorder.Visibility = Visibility.Visible;
+
+            // Position der Markierung ist das Ende des entsprechenden Objekts
+            var position = DrawList[SelectedPointIndex].GetEnd();
+            SelectedPointBorder.Margin = new Thickness(position.X - 5, position.Y - 5, 0, 0);
         }
 
         private void MoveBottom_Click(object sender, RoutedEventArgs e)
         {
             //um einen Millimeter verschieben
-            Edit.EditDraw(DrawList.Last(), Edit.EditType.EndDown);
+            Edit.EditDraw(DrawList[SelectedPointIndex], Edit.EditType.EndDown);
+
+            // Wenn es sich nicht um das Letzte Objekt handelt, 
+            // muss der Startpunkt des nächsten Objekts angeglichen werden
+            if (SelectedPointIndex < DrawList.Count - 1)
+            {
+                // Endpunkt des ausgewählten Objekts ist Startpunkt des nächsten Objekts
+                DrawList[SelectedPointIndex + 1].SetStart(DrawList[SelectedPointIndex].GetEnd());
+                DrawList[SelectedPointIndex + 1].Redraw();
+            }
+
+            // Markierung des ausgewählten Punkts
+            SelectedPointBorder.Visibility = Visibility.Visible;
+
+            // Position der Markierung ist das Ende des entsprechenden Objekts
+            var position = DrawList[SelectedPointIndex].GetEnd();
+            SelectedPointBorder.Margin = new Thickness(position.X - 5, position.Y - 5, 0, 0);
         }
 
         #endregion
@@ -600,6 +706,8 @@ namespace _2DAG_Designer
             //neue Linie wird erstellt und der objectCanvas hinzugefügt
             new DrawLine(lineStart, lineEnd, color, true);
 
+            SelectedPointIndex = DrawList.Count - 1;
+
             //Aktion wird der Aktionsliste hinzugefügt
             ActionList.Add(ActionType.Draw);
         }
@@ -617,12 +725,13 @@ namespace _2DAG_Designer
         {
             //Bogen wird erstellt und der objectCanvas hinzugefügt
             new DrawCircle(startPoint, radius, circleSizeAngle, startAngle, inverted, Brushes.Black);
-           
-            //addToCanvas(DrawList.Last().ThisObject);
+
+            SelectedPointIndex = DrawList.Count - 1;
 
             //Aktion wird der Aktionsliste hinzugefügt
             ActionList.Add(ActionType.Draw);
         }
+
         #endregion
 
         #region undraw/restore

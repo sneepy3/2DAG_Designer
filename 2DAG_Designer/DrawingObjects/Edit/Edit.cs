@@ -104,7 +104,8 @@ namespace _2DAG_Designer.DrawingObjects.Edit
             }
             catch { }
         }
-        public static void EditDraw (IDrawable obj, EditType edit, double value)
+
+        public static void EditDraw(IDrawable obj, EditType edit, double value)
         {
             try
             {
@@ -129,7 +130,5 @@ namespace _2DAG_Designer.DrawingObjects.Edit
             }
             catch { }
         }
-    
-
     }
 }

@@ -196,7 +196,9 @@
 
             <!--Grid für die Zeichenfeldlinien-->
             <Canvas  x:Name="DrawField" Background="LightCyan" Grid.Row="2" Grid.Column="1" >
+                <Border x:Name="SelectedPointBorder" Grid.Column="1" Grid.Row="2" BorderThickness="1" Background="Transparent" Visibility="Hidden" BorderBrush="Black" Height="10" Width="10" CornerRadius="0"/>
             </Canvas>
+           
 
             <!--Überdeckung für überstehende Objekte-->
             <Rectangle Grid.Row="0" Grid.Column="0" Fill="White" />
@@ -272,6 +274,9 @@
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
 
+                        <Button x:Name="PreviousPointButton" Content="vorgeriger" HorizontalAlignment="Left" VerticalAlignment="Top" Click="PreviousPointButton_Click" />
+                        <Button x:Name="NextPointButton" Content="nächster" HorizontalAlignment="Right" VerticalAlignment="Top" Grid.Column="1" Click="NextPointButton_Click"/>
+
                         <Button x:Name="MoveTop" Style="{StaticResource NoTriggerButtonStyle}"  Height="50" Width="50" Grid.Row="0" Grid.ColumnSpan="2"  Margin="10 10" Click="MoveTop_Click">
                             <Button.Background>
                                 <ImageBrush ImageSource="Resources\arrow.png">
@@ -333,6 +338,7 @@
                     Click="DrawArea_Click"  
                     Style="{StaticResource NoTriggerButtonStyle}"
                     Opacity="0.2"/>
+
 
             <!--Canvas für die cm Bezeichnungen-->
             <Canvas x:Name="XLabelCanvas"  Grid.Row="1" Grid.Column="1" />
