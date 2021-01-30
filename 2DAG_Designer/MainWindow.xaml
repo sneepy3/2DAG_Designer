@@ -336,6 +336,7 @@
             <Button x:Name="DrawArea"  
                     Grid.Column="1" Grid.Row="2" 
                     Click="DrawArea_Click"  
+                    PreviewMouseLeftButtonDown="DrawArea_MouseDown"
                     Style="{StaticResource NoTriggerButtonStyle}"
                     Opacity="0.2"/>
 

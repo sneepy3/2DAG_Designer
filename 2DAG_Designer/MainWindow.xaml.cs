@@ -255,43 +255,13 @@ namespace _2DAG_Designer
         private void PreviousPointButton_Click(object sender, RoutedEventArgs e)
         {
             // vorheriger Punkt wird ausgewählt
-            SelectedPointIndex -= 1;
-
-            // wenn der Index kleiner 0 ist,
-            if (SelectedPointIndex < 0)
-                SelectedPointIndex = 0;
-
-            // Markierung des ausgewählten Punkts
-            SelectedPointBorder.Visibility = Visibility.Visible;
-
-            // Position der Markierung ist das Ende des entsprechenden Objekts
-            var position = DrawList[SelectedPointIndex].GetEnd();
-            SelectedPointBorder.Margin = new Thickness(position.X - 5, position.Y - 5, 0, 0);
-
-            // Markierung in den Vordergrund
-            DrawField.Children.Remove(SelectedPointBorder);
-            DrawField.Children.Add(SelectedPointBorder);
+            ChangeSelection(SelectedPointIndex - 1);         
         }
 
         private void NextPointButton_Click(object sender, RoutedEventArgs e)
         {
             // nächster Punkt wird ausgewählt
-            SelectedPointIndex += 1;
-
-            // wenn der Index im auserhalb des Bereichs liegt,
-            if (SelectedPointIndex > DrawList.Count - 1)
-                SelectedPointIndex = DrawList.Count - 1;
-
-            // Markierung des ausgewählten Punkts
-            SelectedPointBorder.Visibility = Visibility.Visible;
-
-            // Position der Markierung ist das Ende des entsprechenden Objekts
-            var position = DrawList[SelectedPointIndex].GetEnd();
-            SelectedPointBorder.Margin = new Thickness(position.X - 5, position.Y - 5, 0, 0);
-
-            // Markierung in den Vordergrund
-            DrawField.Children.Remove(SelectedPointBorder);
-            DrawField.Children.Add(SelectedPointBorder);
+            ChangeSelection(SelectedPointIndex += 1);
         }
 
         private void MoveTop_Click(object sender, RoutedEventArgs e)
@@ -381,55 +351,109 @@ namespace _2DAG_Designer
 
         #endregion
 
+        private void DrawArea_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            // ist die linke Strg-Taste gedrückt,
+            // wird der angeklickte Punkt ausgewählt
+            if (Keyboard.GetKeyStates(Key.LeftCtrl) == KeyStates.Down || Keyboard.GetKeyStates(Key.LeftCtrl) == (KeyStates.Down | KeyStates.Toggled))
+            {
+                // Mausposition relativ zur DrawArea
+                var mousePosition = Mouse.GetPosition(DrawArea);
+
+                // jeder Endpunkt wird überprüft
+                foreach (var drawObject in DrawList)
+                {
+                    var endPoint = drawObject.GetEnd();
+
+                    // Wenn der Endpunt in der nähe der Maus ist,
+                    if (DistanceBetween(mousePosition, endPoint) <= 10)
+                    {
+                        // angeclickter Punkt wird ausgewählt
+                        ChangeSelection(DrawList.IndexOf(drawObject));
+                    }
+                }
+            }
+        }
+
         // Eventhandler für den Zeichenbereich
         private void DrawArea_Click(object sender, RoutedEventArgs e)
         {
-            // Wenn das erste mal angeklickt wird, 
-            if(FirstDraw)
+            // ist die linke Strg-Taste gedrückt,
+            // wird der ausgwählte Punkt bewegt
+            if (Keyboard.GetKeyStates(Key.LeftCtrl) == KeyStates.Down || Keyboard.GetKeyStates(Key.LeftCtrl) == (KeyStates.Down | KeyStates.Toggled))
             {
-                // wird der erste Startpunkt festgelegt
-                var startPosition = Mouse.GetPosition(DrawArea); //Mausposition im Bezug auf DrawArea wird abgefragt
+                // Mausposition relativ zur DrawArea
+                var mousePosition = Mouse.GetPosition(DrawArea);
 
-                //es ein Punkt erstellt und am Start angezeigt
-                new DrawEllipse(startPosition, 4, 4, Brushes.Black, true);
+                // Ausgewähltes Objekt wird zur Mausposition bewegt
+                DrawList[SelectedPointIndex].SetEnd(mousePosition);
+                //Endpunkt wird gerundet
+                DrawList[SelectedPointIndex].Round();
+                DrawList[SelectedPointIndex].Redraw();
 
-                //addToCanvas(DrawList.Last().ThisObject);
 
-                // ab jetzt werden Linien gezeichnet
-                FirstDraw = false;
+                // Wenn es sich nicht um das Letzte Objekt handelt, 
+                // muss der Startpunkt des nächsten Objekts angeglichen werden
+                if (SelectedPointIndex < DrawList.Count - 1)
+                {
+                    // Endpunkt des ausgewählten Objekts ist Startpunkt des nächsten Objekts
+                    DrawList[SelectedPointIndex + 1].SetStart(DrawList[SelectedPointIndex].GetEnd());
+                    DrawList[SelectedPointIndex + 1].Redraw();
+                }               
 
-                //Aktion wird zur Aktionsliste hinzgefügt
-                ActionList.Add(ActionType.Draw);
+                // Markierung des ausgewählten Objekts wird aktualisiert
+                ChangeSelection(SelectedPointIndex);
             }
             else
             {
-                //der Start für das neue Objekt, ist das ende des letzten Objekts
-                var newShapeStart = DrawList.Last().GetEnd();
-
-                //Endposition ist der Mausklick
-                var newShapeEnd = Mouse.GetPosition(DrawArea); //Mausposition im Bezug auf DrawArea wird abgefragt
-
-                //wenn shift gedrückt ist, wird die Linie in grau angezeigt
-                if (Keyboard.IsKeyDown(Key.LeftShift))
+                // Wenn das erste mal angeklickt wird, 
+                if (FirstDraw)
                 {
-                    //graue Linie wird gezeichnet, diese Linien werden nicht eingraviert
-                    DrawLine(newShapeStart, newShapeEnd, Brushes.DarkSlateGray);
+                    // wird der erste Startpunkt festgelegt
+                    var startPosition = Mouse.GetPosition(DrawArea); //Mausposition im Bezug auf DrawArea wird abgefragt
+
+                    //es ein Punkt erstellt und am Start angezeigt
+                    new DrawEllipse(startPosition, 4, 4, Brushes.Black, true);
+
+                    // ab jetzt werden Linien gezeichnet
+                    FirstDraw = false;
+
+                    //Aktion wird zur Aktionsliste hinzgefügt
+                    ActionList.Add(ActionType.Draw);
                 }
                 else
                 {
-                    if(DrawLines)
-                        // die Linie wird gezeichnet in schwarz
-                        DrawLine(newShapeStart, newShapeEnd, Brushes.Black);
-                    //else
-                        //Bogen wird in schwarz gezeichnet
-                        //DrawArc(newShapeStart, newShapeEnd, Brushes.Black);
+                    //der Start für das neue Objekt, ist das ende des letzten Objekts
+                    var newShapeStart = DrawList.Last().GetEnd();
 
-                    //drawArc(drawList.Last().GetStart(),
-                    //       100, 100, 0, Brushes.Black);
+                    //Endposition ist der Mausklick
+                    var newShapeEnd = Mouse.GetPosition(DrawArea); //Mausposition im Bezug auf DrawArea wird abgefragt
+
+                    //wenn shift gedrückt ist, wird die Linie in grau angezeigt
+                    if (Keyboard.IsKeyDown(Key.LeftShift))
+                    {
+                        //graue Linie wird gezeichnet, diese Linien werden nicht eingraviert
+                        DrawLine(newShapeStart, newShapeEnd, Brushes.DarkSlateGray);
+                    }
+                    else
+                    {
+                        if (DrawLines)
+                            // die Linie wird gezeichnet in schwarz
+                            DrawLine(newShapeStart, newShapeEnd, Brushes.Black);
+                        else
+                        {
+                            // Abstand zwischen Start und Ende
+                            var startEndDistance = DistanceBetween(newShapeStart, newShapeEnd);
+
+                            var startAngle = (Math.Acos((newShapeEnd.X - newShapeStart.X) / startEndDistance) / (Math.PI / 180.0)) - 90;
+
+                            DrawCircle(newShapeStart, DistanceBetween(newShapeStart, newShapeEnd) / 2, 180, startAngle, false);
+                        }
+                    }
+
+                    Measure();
+
                 }
-
-                Measure();
-
             }
         }
 
@@ -517,6 +541,7 @@ namespace _2DAG_Designer
                 ApplyTextButton.BorderBrush = Brushes.Red;
             }
         }
+       
 
         #region Arduino
 
@@ -728,7 +753,7 @@ namespace _2DAG_Designer
         /// <param name="height"></param>
         /// <param name="angle"></param>
         /// <param name="color"></param>
-        private void DrawCircle(Point startPoint,double radius, double circleSizeAngle, double startAngle, bool inverted)
+        private void DrawCircle(Point startPoint, double radius, double circleSizeAngle, double startAngle, bool inverted)
         {
             //Bogen wird erstellt und der objectCanvas hinzugefügt
             new DrawCircle(startPoint, radius, circleSizeAngle, startAngle, inverted, Brushes.Black);
@@ -1017,6 +1042,34 @@ namespace _2DAG_Designer
         }
 
         /// <summary>
+        /// ändern des ausgewählten Punktes
+        /// </summary>
+        /// <param name="newIndex">neuer Index in der DrawList</param>
+        private void ChangeSelection(int newIndex)
+        {
+            SelectedPointIndex = newIndex;
+
+            // wenn der Index kleiner 0 ist,
+            if (SelectedPointIndex < 0)
+                SelectedPointIndex = 0;
+
+            // wenn der Index im auserhalb des Bereichs liegt,
+            else if (SelectedPointIndex > DrawList.Count - 1)
+                SelectedPointIndex = DrawList.Count - 1;
+
+            // Markierung des ausgewählten Punkts
+            SelectedPointBorder.Visibility = Visibility.Visible;
+
+            // Position der Markierung ist das Ende des entsprechenden Objekts
+            var position = DrawList[SelectedPointIndex].GetEnd();
+            SelectedPointBorder.Margin = new Thickness(position.X - 5, position.Y - 5, 0, 0);
+
+            // Markierung in den Vordergrund
+            DrawField.Children.Remove(SelectedPointBorder);
+            DrawField.Children.Add(SelectedPointBorder);
+        }
+
+        /// <summary>
         /// Zeigt Maße an
         /// </summary>
         public void Measure()
@@ -1270,6 +1323,7 @@ namespace _2DAG_Designer
                 Application.Current.MainWindow.Width = WindowWidth;
             }
         }
+
 
         #endregion
         //-------------------------------------------------

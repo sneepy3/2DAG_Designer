@@ -274,15 +274,15 @@ namespace _2DAG_Designer.DrawingObjects.Objects
         /// dem Abstand und dem Winkel
         /// </summary>
         /// <param name="startPoint"></param>
-        /// <param name="disctance"></param>
+        /// <param name="distance"></param>
         /// <param name="angle"></param>
         /// <returns></returns>
-        private Point CalculatePoint(Point startPoint, double disctance, double angle)
+        private Point CalculatePoint(Point startPoint, double distance, double angle)
         {
             return new Point()
             {
-                X = startPoint.X + (Math.Cos(angle * (Math.PI / 180.0)) * disctance),
-                Y = startPoint.Y + (Math.Sin(angle * (Math.PI / 180.0)) * disctance)
+                X = startPoint.X + (Math.Cos(angle * (Math.PI / 180.0)) * distance),
+                Y = startPoint.Y + (Math.Sin(angle * (Math.PI / 180.0)) * distance)
             };
         }
         
