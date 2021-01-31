@@ -437,22 +437,41 @@ namespace _2DAG_Designer
                     }
                     else
                     {
+                        // wenn Linien gezeichnet werden sollen
                         if (DrawLines)
+                        {
                             // die Linie wird gezeichnet in schwarz
                             DrawLine(newShapeStart, newShapeEnd, Brushes.Black);
+                        }
+                        // wenn Kreise gezeichnet werden sollen
                         else
                         {
-                            // Abstand zwischen Start und Ende
-                            var startEndDistance = DistanceBetween(newShapeStart, newShapeEnd);
+                            // Abstände der Punkte
+                            var xDistance = newShapeEnd.X - newShapeStart.X;
+                            var yDistance = newShapeEnd.Y - newShapeStart.Y;
 
-                            var startAngle = (Math.Acos((newShapeEnd.X - newShapeStart.X) / startEndDistance) / (Math.PI / 180.0)) - 90;
+                            // Anfangswinkel für den Kreis
+                            var startAngle = Math.Atan(yDistance / xDistance) / (Math.PI / 180.0) - 90;                            
+                            
+                            // Wenn der Endpunkt links vom Start liegt,
+                            if(xDistance < 0)
+                            {
+                                startAngle += 180;
+                            }
 
-                            DrawCircle(newShapeStart, DistanceBetween(newShapeStart, newShapeEnd) / 2, 180, startAngle, false);
+                            // Wenn der Kreis invertiert ist
+                            if(CircleInvertedCheckBox.IsChecked.Value)
+                            {
+                                startAngle += 180;
+                            }
+
+                            // Kreis wird gezeichnet
+                            DrawCircle(newShapeStart, DistanceBetween(newShapeStart, newShapeEnd) / 2, 180, startAngle, CircleInvertedCheckBox.IsChecked.Value);
                         }
                     }
 
+                    // Maße werden aktualisiert
                     Measure();
-
                 }
             }
         }
@@ -541,7 +560,6 @@ namespace _2DAG_Designer
                 ApplyTextButton.BorderBrush = Brushes.Red;
             }
         }
-       
 
         #region Arduino
 
@@ -738,7 +756,8 @@ namespace _2DAG_Designer
             //neue Linie wird erstellt und der objectCanvas hinzugefügt
             new DrawLine(lineStart, lineEnd, color, true);
 
-            SelectedPointIndex = DrawList.Count - 1;
+            // neu gezeichnetes Objekt wird ausgewählt
+            ChangeSelection(DrawList.Count - 1);
 
             //Aktion wird der Aktionsliste hinzugefügt
             ActionList.Add(ActionType.Draw);
@@ -748,17 +767,13 @@ namespace _2DAG_Designer
         /// zeichnet Arc mit Endpunktangabe
         /// </summary>
         /// <param name="startPoint"></param>
-        /// <param name="endPoint"></param>
-        /// <param name="width"></param>
-        /// <param name="height"></param>
-        /// <param name="angle"></param>
-        /// <param name="color"></param>
         private void DrawCircle(Point startPoint, double radius, double circleSizeAngle, double startAngle, bool inverted)
         {
             //Bogen wird erstellt und der objectCanvas hinzugefügt
             new DrawCircle(startPoint, radius, circleSizeAngle, startAngle, inverted, Brushes.Black);
 
-            SelectedPointIndex = DrawList.Count - 1;
+            // neu gezeichnetes Objekt wird ausgewählt
+            ChangeSelection(DrawList.Count - 1);
 
             //Aktion wird der Aktionsliste hinzugefügt
             ActionList.Add(ActionType.Draw);
@@ -798,6 +813,9 @@ namespace _2DAG_Designer
                 //startet der Zeichenprozess von vorne
                 FirstDraw = true;
             }
+
+            // letztes Objekt wird ausgewählt
+            ChangeSelection(DrawList.Count - 1);
 
             //Messungen werden aktualisiert
             Measure();
@@ -880,6 +898,9 @@ namespace _2DAG_Designer
 
                 //Zeichenprozess hat in jedem Fall begonnen
                 FirstDraw = false;
+
+                // letztes Objekt wird ausgewählt
+                ChangeSelection(DrawList.Count - 1);
 
                 Measure();
             }
