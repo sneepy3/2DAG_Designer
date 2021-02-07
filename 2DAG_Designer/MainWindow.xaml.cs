@@ -15,6 +15,7 @@ using _2DAG_Designer.Arduino;
 using _2DAG_Designer.Arduino.Engrave;
 using _2DAG_Designer.BurnSimulation;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace _2DAG_Designer
 {    /*    TODO:
@@ -51,11 +52,32 @@ namespace _2DAG_Designer
         {
             Draw,
             Delete,
-            
+
             Restore,
             RestoreAll,
 
             EditSize,
+        }
+
+        /// <summary>
+        /// Modi für Zeichnen von Objekten
+        /// </summary>
+        private enum DrawMode
+        {
+            /// <summary>
+            /// neue Objekte anhängen
+            /// </summary>
+            Append,
+
+            /// <summary>
+            /// neues Objekt einfügen
+            /// </summary>
+            Insert,
+
+            /// <summary>
+            /// bestehendes Objekt bewegen
+            /// </summary>
+            Move,
         }
 
         #endregion
@@ -71,12 +93,32 @@ namespace _2DAG_Designer
 
         //Liste aller gezeichneten Objekte
         public static List<IDrawable> DrawList = new List<IDrawable>();
-   
+
 
         //Liste der gelöschten Objekte (Arrayliste, da auch mehrere Objekte auf einmal gelöscht werden können)
         public static List<IDrawable[]> DeletedDrawList = new List<IDrawable[]>();
 
         #endregion
+
+        private EventHandler DrawModeChanged;
+
+        private DrawMode _drawMode;
+
+        // Modus für den Zeichenbereich
+        private DrawMode drawMode 
+        {
+            get
+            {
+                return _drawMode;
+            }
+            set
+            {
+                _drawMode = value;
+
+                // Event invoke 
+                DrawModeChanged.Invoke(this, EventArgs.Empty);
+            }
+        }
 
         // gibt den Momentan ausgewählten Punkt an
         public static int SelectedPointIndex;
@@ -100,6 +142,10 @@ namespace _2DAG_Designer
             InitializeComponent();
 
             ThisWindow = this;
+
+            // Zeichenmodus Eventhandler
+            DrawModeChanged += DrawModeChangedHandler;
+            drawMode = DrawMode.Append;
         }
 
         #endregion
@@ -121,9 +167,11 @@ namespace _2DAG_Designer
                 _currentFilePath = DrawFile.BrowseExplorer();
 
                 //Wenn der Pfad nicht leer ist,
-                if(_currentFilePath != "")
+                if (_currentFilePath != "")
                     // Datei wird eingelesen und Objekte werden erstellt
-                    DrawFile.ListFromFile(_currentFilePath);
+                    DrawList = DrawFile.ListFromFile(_currentFilePath);
+
+                FirstDraw = false;
 
                 //Aktion wird hinzugefüt
                 ActionList.Add(ActionType.RestoreAll);
@@ -141,7 +189,7 @@ namespace _2DAG_Designer
             try
             {
                 //wenn noch kein Pfad vorhanden ist,
-                if(_currentFilePath == "")
+                if (_currentFilePath == "")
                 {
                     //Dateipfad wird abgespeichert
                     _currentFilePath = DrawFile.SaveFileToDialog();
@@ -197,7 +245,7 @@ namespace _2DAG_Designer
             //Prozess wird gestartet, Dokument öffnet sich
             openDocumentation.Start();
         }
-        
+
         #endregion
 
         #region CheckBox Handler
@@ -228,11 +276,11 @@ namespace _2DAG_Designer
         {
             UndoLastAction();
         }
- 
+
         private void Redo_Click(object sender, RoutedEventArgs e)
         {
             RedoAction();
-        }        
+        }
 
         #endregion
 
@@ -240,7 +288,8 @@ namespace _2DAG_Designer
 
         private void DeleteButton_Click(object sender, RoutedEventArgs e)
         {
-            UndrawlastObject();
+            // Ausgewähltes Objekt wird entfernt
+            UndrawObject(SelectedPointIndex);
         }
 
         private void DeleteAllButton_Click(object sender, RoutedEventArgs e)
@@ -255,7 +304,7 @@ namespace _2DAG_Designer
         private void PreviousPointButton_Click(object sender, RoutedEventArgs e)
         {
             // vorheriger Punkt wird ausgewählt
-            ChangeSelection(SelectedPointIndex - 1);         
+            ChangeSelection(SelectedPointIndex - 1);
         }
 
         private void NextPointButton_Click(object sender, RoutedEventArgs e)
@@ -271,11 +320,10 @@ namespace _2DAG_Designer
 
             // Wenn es sich nicht um das Letzte Objekt handelt, 
             // muss der Startpunkt des nächsten Objekts angeglichen werden
-            if(SelectedPointIndex < DrawList.Count - 1)
+            if (SelectedPointIndex < DrawList.Count - 1)
             {
                 // Endpunkt des ausgewählten Objekts ist Startpunkt des nächsten Objekts
                 DrawList[SelectedPointIndex + 1].SetStart(DrawList[SelectedPointIndex].GetEnd());
-                DrawList[SelectedPointIndex + 1].Redraw();
             }
 
             // Position der Markierung ist das Ende des entsprechenden Objekts
@@ -294,7 +342,6 @@ namespace _2DAG_Designer
             {
                 // Endpunkt des ausgewählten Objekts ist Startpunkt des nächsten Objekts
                 DrawList[SelectedPointIndex + 1].SetStart(DrawList[SelectedPointIndex].GetEnd());
-                DrawList[SelectedPointIndex + 1].Redraw();
             }
 
             // Markierung des ausgewählten Punkts
@@ -316,7 +363,6 @@ namespace _2DAG_Designer
             {
                 // Endpunkt des ausgewählten Objekts ist Startpunkt des nächsten Objekts
                 DrawList[SelectedPointIndex + 1].SetStart(DrawList[SelectedPointIndex].GetEnd());
-                DrawList[SelectedPointIndex + 1].Redraw();
             }
 
             // Markierung des ausgewählten Punkts
@@ -338,7 +384,6 @@ namespace _2DAG_Designer
             {
                 // Endpunkt des ausgewählten Objekts ist Startpunkt des nächsten Objekts
                 DrawList[SelectedPointIndex + 1].SetStart(DrawList[SelectedPointIndex].GetEnd());
-                DrawList[SelectedPointIndex + 1].Redraw();
             }
 
             // Markierung des ausgewählten Punkts
@@ -351,11 +396,13 @@ namespace _2DAG_Designer
 
         #endregion
 
+        #region DrawArea
+
         private void DrawArea_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            // ist die linke Strg-Taste gedrückt,
+            // ist der Zeichenmodus auf bewegen,
             // wird der angeklickte Punkt ausgewählt
-            if (Keyboard.GetKeyStates(Key.LeftCtrl) == KeyStates.Down || Keyboard.GetKeyStates(Key.LeftCtrl) == (KeyStates.Down | KeyStates.Toggled))
+            if (drawMode == DrawMode.Move)
             {
                 // Mausposition relativ zur DrawArea
                 var mousePosition = Mouse.GetPosition(DrawArea);
@@ -375,12 +422,11 @@ namespace _2DAG_Designer
             }
         }
 
-        // Eventhandler für den Zeichenbereich
         private void DrawArea_Click(object sender, RoutedEventArgs e)
         {
-            // ist die linke Strg-Taste gedrückt,
+            // ist der Zeichenmodus auf bewegen,
             // wird der ausgwählte Punkt bewegt
-            if (Keyboard.GetKeyStates(Key.LeftCtrl) == KeyStates.Down || Keyboard.GetKeyStates(Key.LeftCtrl) == (KeyStates.Down | KeyStates.Toggled))
+            if (drawMode == DrawMode.Move)
             {
                 // Mausposition relativ zur DrawArea
                 var mousePosition = Mouse.GetPosition(DrawArea);
@@ -398,8 +444,7 @@ namespace _2DAG_Designer
                 {
                     // Endpunkt des ausgewählten Objekts ist Startpunkt des nächsten Objekts
                     DrawList[SelectedPointIndex + 1].SetStart(DrawList[SelectedPointIndex].GetEnd());
-                    DrawList[SelectedPointIndex + 1].Redraw();
-                }               
+                }
 
                 // Markierung des ausgewählten Objekts wird aktualisiert
                 ChangeSelection(SelectedPointIndex);
@@ -412,8 +457,11 @@ namespace _2DAG_Designer
                     // wird der erste Startpunkt festgelegt
                     var startPosition = Mouse.GetPosition(DrawArea); //Mausposition im Bezug auf DrawArea wird abgefragt
 
-                    //es ein Punkt erstellt und am Start angezeigt
-                    new DrawEllipse(startPosition, 4, 4, Brushes.Black, true);
+                    // es ein Punkt erstellt
+                    var newPoint = new DrawEllipse(startPosition, 4, 4, true);
+
+                    // Punkt wird gezeichnet
+                    Draw(newPoint, -1);
 
                     // ab jetzt werden Linien gezeichnet
                     FirstDraw = false;
@@ -424,50 +472,58 @@ namespace _2DAG_Designer
                 else
                 {
                     //der Start für das neue Objekt, ist das ende des letzten Objekts
-                    var newShapeStart = DrawList.Last().GetEnd();
+                    var newObjectStart = DrawList.Last().GetEnd();
 
                     //Endposition ist der Mausklick
-                    var newShapeEnd = Mouse.GetPosition(DrawArea); //Mausposition im Bezug auf DrawArea wird abgefragt
+                    var newObjectEnd = Mouse.GetPosition(DrawArea); //Mausposition im Bezug auf DrawArea wird abgefragt
 
-                    //wenn shift gedrückt ist, wird die Linie in grau angezeigt
-                    if (Keyboard.IsKeyDown(Key.LeftShift))
+                    // Index des neuen Objekts in der DrawList
+                    // -1 für anhängen an die Liste
+                    var index = -1;
+
+                    if(drawMode == DrawMode.Insert)
                     {
-                        //graue Linie wird gezeichnet, diese Linien werden nicht eingraviert
-                        DrawLine(newShapeStart, newShapeEnd, Brushes.DarkSlateGray);
+                        // Startpunkt ist Endpunkt des ausgewählten Objekts
+                        newObjectStart = DrawList[SelectedPointIndex].GetEnd();
+
+                        index = SelectedPointIndex + 1;
+                    }                   
+                   
+                    // wenn Linien gezeichnet werden sollen
+                    if (DrawLines)
+                    {
+                        var newLine = new DrawLine(newObjectStart, newObjectEnd, DrawLine.LineMode.Normal, true);
+
+                        // die Linie wird gezeichnet in schwarz
+                        Draw(newLine, index);
                     }
+                    // wenn Kreise gezeichnet werden sollen
                     else
                     {
-                        // wenn Linien gezeichnet werden sollen
-                        if (DrawLines)
+                        // Abstände der Punkte
+                        var xDistance = newObjectEnd.X - newObjectStart.X;
+                        var yDistance = newObjectEnd.Y - newObjectStart.Y;
+
+                        // Anfangswinkel für den Kreis
+                        var startAngle = Math.Atan(yDistance / xDistance) / (Math.PI / 180.0) - 90;
+
+                        // Wenn der Endpunkt links vom Start liegt,
+                        if (xDistance < 0)
                         {
-                            // die Linie wird gezeichnet in schwarz
-                            DrawLine(newShapeStart, newShapeEnd, Brushes.Black);
+                            startAngle += 180;
                         }
-                        // wenn Kreise gezeichnet werden sollen
-                        else
+
+                        // Wenn der Kreis invertiert ist
+                        if (CircleInvertedCheckBox.IsChecked.Value)
                         {
-                            // Abstände der Punkte
-                            var xDistance = newShapeEnd.X - newShapeStart.X;
-                            var yDistance = newShapeEnd.Y - newShapeStart.Y;
-
-                            // Anfangswinkel für den Kreis
-                            var startAngle = Math.Atan(yDistance / xDistance) / (Math.PI / 180.0) - 90;                            
-                            
-                            // Wenn der Endpunkt links vom Start liegt,
-                            if(xDistance < 0)
-                            {
-                                startAngle += 180;
-                            }
-
-                            // Wenn der Kreis invertiert ist
-                            if(CircleInvertedCheckBox.IsChecked.Value)
-                            {
-                                startAngle += 180;
-                            }
-
-                            // Kreis wird gezeichnet
-                            DrawCircle(newShapeStart, DistanceBetween(newShapeStart, newShapeEnd) / 2, 180, startAngle, CircleInvertedCheckBox.IsChecked.Value);
+                            startAngle += 180;
                         }
+
+                        // Kreis wird erstellt
+                        var newCircle = new DrawCircle(newObjectStart, DistanceBetween(newObjectStart, newObjectEnd) / 2, 180, startAngle, CircleInvertedCheckBox.IsChecked.Value);
+
+                        // Kreis wird gezeichnet
+                        Draw(newCircle, index);
                     }
 
                     // Maße werden aktualisiert
@@ -476,8 +532,16 @@ namespace _2DAG_Designer
             }
         }
 
+        private void DrawArea_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            // rechtsclick fokusiert DrawArea
+            DrawArea.Focus();
+        }
+
+        #endregion
+
         private void CreateArcButton_Click(object sender, RoutedEventArgs e)
-        {         
+        {
             try
             {
                 //Werte aus den Textboxen werden abgespeichert
@@ -486,7 +550,7 @@ namespace _2DAG_Designer
 
 
                 //der Radius und die Größe des Kreises müssen positiv sein
-                if((circleSizeAngle <= 0) || (radius <= 0))
+                if ((circleSizeAngle <= 0) || (radius <= 0))
                 {
                     throw new Exception("");
                 }
@@ -503,9 +567,10 @@ namespace _2DAG_Designer
                 else
                     startAngle = DrawList.Last().Angle;
 
+                var newCircle = new DrawCircle(DrawList.Last().GetEnd(), radius, circleSizeAngle, startAngle, CircleInvertedCheckBox.IsChecked.Value);
+
                 //der Kreis wird gezeichnet
-                DrawCircle(DrawList.Last().GetEnd(),
-                        radius, circleSizeAngle, startAngle, CircleInvertedCheckBox.IsChecked.Value);
+                Draw(newCircle, -1);
 
                 //wenn alles funktioniert hat, bleibt die Umrandung des Buttons schwarz
                 CreateArcButton.BorderBrush = Brushes.Gray;
@@ -519,7 +584,7 @@ namespace _2DAG_Designer
                 CreateArcButton.BorderBrush = Brushes.Red;
             }
         }
-        
+
         private void ApplySizeChangeButton_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -536,11 +601,11 @@ namespace _2DAG_Designer
                 // wenn etwas nicht funktioniert hat, wird der Button rot umrandet
                 ApplySizeChangeButton.BorderBrush = Brushes.Red;
             }
-         
+
             //Messungen werden aktualisiert
             Measure();
         }
-        
+
         private void ApplyTextButton_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -569,7 +634,7 @@ namespace _2DAG_Designer
             Arduino.Communication.ConnectButtonClicked();
 
             //Wenn eine Verbindung existiert
-            if(Communication.IsConnected)
+            if (Communication.IsConnected)
             {
                 //UploadButton wird sichtbar
                 ArduinoUploadButton.IsEnabled = true;
@@ -594,7 +659,7 @@ namespace _2DAG_Designer
                 AvailablePortsComboBox.Items.Add("kein Port gefunden");
 
             //alle zurückgegebenen ports werden hinzugefügt
-            foreach (var port  in ports)
+            foreach (var port in ports)
             {
                 //Port wird hinzugefügt
                 AvailablePortsComboBox.Items.Add(port);
@@ -604,7 +669,7 @@ namespace _2DAG_Designer
         private void ArduinoUploadButton_Click(object sender, RoutedEventArgs e)
         {
             //Wenn eine Verbindung zum Arduino besteht
-            if(Communication.IsConnected)
+            if (Communication.IsConnected)
             {
                 ////Bewegung in X Richtung
                 //ArduinoTest.MoveX((int)Math.Round(PixelToCentimeter(DrawList.Last().Width)));
@@ -632,7 +697,7 @@ namespace _2DAG_Designer
         }
 
         #endregion
-        
+
         /// <summary>
         /// wird ausgeführt, wenn auf der Tastatur eine Taste gedrückt wurde
         /// </summary>
@@ -644,99 +709,151 @@ namespace _2DAG_Designer
             bool anyActionTriggered = false;
 
             //Wenn die Textbox fokusiert ist, finden keine Verschiebungen etc statt
-            if(!DrawLettersTextBox.IsFocused)
+            if (!DrawLettersTextBox.IsFocused)
             {
                 //Aktionen, die nur ausgeführt werden können, wenn mindestens 1 Objekt existiert
-                if(DrawList.Count > 0)
+                if (DrawList.Count > 0)
                 {
-                    //nach oben verschieben
-                     if (Keyboard.IsKeyDown(Key.NumPad8))
+                    // Aktionen sollen nur ausgeführt werden, wenn der Zeichenbereich fokusiert ist
+                    if(DrawArea.IsFocused)
                     {
-                        //um einen Millimeter verschieben
-                        Edit.EditDraw(DrawList.Last(), Edit.EditType.EndUp);
+                        //nach oben verschieben
+                        if (Keyboard.IsKeyDown(Key.NumPad8))
+                        {
+                            //um einen Millimeter verschieben
+                            MoveTop_Click(null, null);
 
-                        anyActionTriggered = true;
+
+                            anyActionTriggered = true;
+                        }
+
+                        // nach unten verschieben
+                        if (Keyboard.IsKeyDown(Key.NumPad2))
+                        {
+                            //um einen Millimeter verschieben
+                            MoveBottom_Click(null, null);
+
+                            anyActionTriggered = true;
+                        }
+
+                        // nach links verschieben
+                        if (Keyboard.IsKeyDown(Key.NumPad4))
+                        {
+                            //um einen Millimeter verschieben
+                            MoveLeft_Click(null, null);
+
+                            anyActionTriggered = true;
+                        }
+
+                        // nach rechts verschieben
+                        if (Keyboard.IsKeyDown(Key.NumPad6))
+                        {
+                            //um einen Millimeter verschieben
+                            MoveRight_Click(null, null);
+
+                            anyActionTriggered = true;
+                        }
+
+                        //invert
+                        if (Keyboard.IsKeyDown(Key.NumPad5))
+                        {
+                            //
+                            Edit.EditDraw(DrawList.Last(), Edit.EditType.Invert);
+
+                            anyActionTriggered = true;
+                        }
+
+                        //rotieren
+                        if (Keyboard.IsKeyDown(Key.R))
+                        {
+                            Edit.EditDraw(DrawList.Last(), Edit.EditType.Angle, DrawList.Last().Angle + 2.5);
+
+                            anyActionTriggered = true;
+                        }
+
                     }
-
-                    // nach unten verschieben
-                    if (Keyboard.IsKeyDown(Key.NumPad2))
-                    {
-                        //um einen Millimeter verschieben
-                        Edit.EditDraw(DrawList.Last(), Edit.EditType.EndDown);
-
-                        anyActionTriggered = true;
-                    }
-
-                    // nach links verschieben
-                    if (Keyboard.IsKeyDown(Key.NumPad4))
-                    {
-                        //um einen Millimeter verschieben
-                        Edit.EditDraw(DrawList.Last(), Edit.EditType.EndLeft);
-
-                        anyActionTriggered = true;
-                    }
-
-                    // nach rechts verschieben
-                    if (Keyboard.IsKeyDown(Key.NumPad6))
-                    {
-                        //um einen Millimeter verschieben
-                        Edit.EditDraw(DrawList.Last(), Edit.EditType.EndRight);
-
-                        anyActionTriggered = true;
-                    }
-
-                    //invert
-                    if (Keyboard.IsKeyDown(Key.NumPad5))
-                    {
-                        //
-                        Edit.EditDraw(DrawList.Last(), Edit.EditType.Invert);
-
-                        anyActionTriggered = true;
-                    }
-
-                    //rotieren
-                    if (Keyboard.IsKeyDown(Key.R))
-                    {
-                        Edit.EditDraw(DrawList.Last(), Edit.EditType.Angle,DrawList.Last().Angle + 2.5);
-
-                        anyActionTriggered = true;
-                    }
-
                 }
             }
 
-            //Rückgängig machen STRG + Z
-            if (Keyboard.IsKeyDown(Key.LeftCtrl) && Keyboard.IsKeyDown(Key.Z))
+            // LEFT-CTRL
+            if(Keyboard.IsKeyDown(Key.LeftCtrl))
             {
-                //letzte Aktion wird rückgängig gemacht
-                UndoLastAction();
+                // Zeichenmodus auf bewegen
+                drawMode = DrawMode.Move;
 
-                anyActionTriggered = true;
-            }
+                //Rückgängig machen STRG + Z
+                if (Keyboard.IsKeyDown(Key.Z))
+                {
+                    //letzte Aktion wird rückgängig gemacht
+                    UndoLastAction();
 
-            //wieder Ausführen STRG + Y
-            if (Keyboard.IsKeyDown(Key.LeftCtrl) && Keyboard.IsKeyDown(Key.Y))
-            {
-                //letzte rückgängig gemachte Aktion wird wieder ausgeführt
-                RedoAction();
+                    anyActionTriggered = true;
+                }
 
-                anyActionTriggered = true;
-            }
+                //wieder Ausführen STRG + Y
+                if (Keyboard.IsKeyDown(Key.Y))
+                {
+                    //letzte rückgängig gemachte Aktion wird wieder ausgeführt
+                    RedoAction();
 
-            //Speichern mit STRG + S
-            if (Keyboard.IsKeyDown(Key.LeftCtrl) && Keyboard.IsKeyDown(Key.S))
+                    anyActionTriggered = true;
+                }
+
+                //Speichern mit STRG + S
+                if (Keyboard.IsKeyDown(Key.S))
             {
                 //Speichern
                 MenuSaveFile_Click(null, null);
 
                 anyActionTriggered = true;
             }
+            }
+
+            // LEFT.SHIFT
+            if(Keyboard.IsKeyDown(Key.LeftShift))
+            {
+                // Zeichenmodus auf einfügen
+                drawMode = DrawMode.Insert;
+            }
 
             //nur wenn eine der Aktionen durchgeführt wurde, werden die Maße angezeigt
             if (anyActionTriggered)
                 Measure();
         }
-                
+
+        private void Window_KeyUp(object sender, KeyEventArgs e)
+        {
+            // LEFT-CTRL oder LEFT-SHIFT
+            if(Keyboard.IsKeyUp(Key.LeftCtrl) || Keyboard.IsKeyUp(Key.LeftShift))
+            {
+                // Zeichenmodus auf anhängen
+                drawMode = DrawMode.Append;
+            }
+        }
+
+        private void DrawModeChangedHandler(object s, EventArgs e)
+        {
+            // Bezeichnung für den Zeichenmodus wird aktualisiert
+            switch (drawMode)
+            {
+                case DrawMode.Append:
+                    {
+                        DrawModeLabel.Content = "Anhängen";
+                    }
+                    break;
+                case DrawMode.Insert:
+                    {
+                        DrawModeLabel.Content = "Einfügen";
+                    }
+                    break;
+                case DrawMode.Move:
+                    {
+                        DrawModeLabel.Content = "Bewegen";
+                    }
+                    break;
+            }
+        }
+
         #endregion
         //-------------------------------------------------
 
@@ -746,34 +863,25 @@ namespace _2DAG_Designer
 
         #region drawing
 
-        /// <summary>
-        /// zeichnet eine Line vom Start zum Endpunkt   
-        /// </summary>
-        /// <param name="lineStart">Start der Linie</param>
-        /// <param name="lineEnd">Ende der Linie</param>
-        private void DrawLine(Point lineStart, Point lineEnd, SolidColorBrush color)
+        public void Draw(IDrawable newDrawObject, int index)
         {
-            //neue Linie wird erstellt und der objectCanvas hinzugefügt
-            new DrawLine(lineStart, lineEnd, color, true);
+            // Wenn das Objekt der Liste angehängt werden soll,
+            if (index == -1 || index == DrawList.Count())
+            {
+                index = DrawList.Count();
+            }
+            // Wenn das Objekt eingefügt werden soll,
+            else
+            {
+                // muss der Startpunkt des nächsten Objekts angepasst werden
+                DrawList[index].SetStart(newDrawObject.GetEnd());
+            }
+
+            // Objekt wird zur Liste hinzugefügt
+            DrawList.Insert(index, newDrawObject);
 
             // neu gezeichnetes Objekt wird ausgewählt
-            ChangeSelection(DrawList.Count - 1);
-
-            //Aktion wird der Aktionsliste hinzugefügt
-            ActionList.Add(ActionType.Draw);
-        }
-
-        /// <summary>
-        /// zeichnet Arc mit Endpunktangabe
-        /// </summary>
-        /// <param name="startPoint"></param>
-        private void DrawCircle(Point startPoint, double radius, double circleSizeAngle, double startAngle, bool inverted)
-        {
-            //Bogen wird erstellt und der objectCanvas hinzugefügt
-            new DrawCircle(startPoint, radius, circleSizeAngle, startAngle, inverted, Brushes.Black);
-
-            // neu gezeichnetes Objekt wird ausgewählt
-            ChangeSelection(DrawList.Count - 1);
+            ChangeSelection(index);
 
             //Aktion wird der Aktionsliste hinzugefügt
             ActionList.Add(ActionType.Draw);
@@ -786,36 +894,44 @@ namespace _2DAG_Designer
         /// <summary>
         /// letztes Objekt wird entfernt
         /// </summary>
-        public void UndrawlastObject()
+        public void UndrawObject(int index)
         {
-            //Wenn mindestens 1 Objekt existiert, kann das Letzte gelöscht werden
-            if(DrawList.Count >= 1)
-            { 
+            //Wenn mindestens 1 Objekt existiert
+            if (DrawList.Count >= 1)
+            {
+                // das erste Objekt kann nur gelöscht werden, wenn es das einzige ist
+                if (index == 0 && DrawList.Count > 1)
+                    return;
+
                 //Objekt wird aus der objectCanvas entfernt
-                DrawList.Last().Remove();
+                DrawList[index].Remove();
 
                 //Objekt wird zu den gelöschten Objekten hinzugefügt
                 DeletedDrawList.Add(new IDrawable[1] { DrawList.Last() });
-  
+
+                // Wenn es sich nicht um das letzte Objekt handelt
+                if(index != DrawList.Count - 1)
+                    DrawList[index + 1].SetStart(DrawList[index].GetStart());
+
                 //Objekt wird aus der Liste gelöscht 
-                DrawList.RemoveAt(DrawList.Count - 1);
+                DrawList.RemoveAt(index);
 
                 //aktion wird der Aktionsliste hinzugefügt, es sei denn diese Funktion wird von der undoLastAction Funktion aufgerufen
-                if(!Undooing)
+                if (!Undooing)
                     ActionList.Add(ActionType.Delete);
                 else
                     reversedActionList.Add(ActionType.Delete);
             }
 
             //Wenn jetzt kein Objekt mehr existiert,
-            if(DrawList.Count == 0)
+            if (DrawList.Count == 0)
             {
                 //startet der Zeichenprozess von vorne
                 FirstDraw = true;
             }
 
-            // letztes Objekt wird ausgewählt
-            ChangeSelection(DrawList.Count - 1);
+            // vorheriges Objekt wird ausgewählt
+            ChangeSelection(index -1);
 
             //Messungen werden aktualisiert
             Measure();
@@ -829,7 +945,7 @@ namespace _2DAG_Designer
             //enthält die in diesem Druchlauf gelöschten Objekte
             var deleted = new List<IDrawable>();
 
-            foreach(var obj in DrawList)
+            foreach (var obj in DrawList)
             {
                 //Objekt wird aus der objectCanvas entfernt
                 obj.Remove();
@@ -848,10 +964,13 @@ namespace _2DAG_Designer
             FirstDraw = true;
 
             //Aktion wird zur Aktionsliste hinzgefügt, wenn diese Funktion nicht von der undoLastAction Funktion aufgerufen wirde
-            if(!Undooing)
+            if (!Undooing)
                 ActionList.Add(ActionType.Delete);
             else
                 reversedActionList.Add(ActionType.Delete);
+
+            // Auswahlmarkierung wird unsichtbar
+            SelectedPointBorder.Visibility = Visibility.Hidden;
 
             //Messungen werden aktualisiert
             Measure();
@@ -863,11 +982,11 @@ namespace _2DAG_Designer
         public void RestoredeledetObject()
         {
             //wenn bereits ein Objekt gelöscht wurde
-            if(DeletedDrawList.Count > 0)
+            if (DeletedDrawList.Count > 0)
             {
                 //Aktion wird zur Aktionsliste hinzgefügt
                 //Wenn mehrere Objekte wiederhergestellt werden, wird die Aktion restoreall hinzugefügt
-                if(Undooing)
+                if (Undooing)
                 {
                     // wenn die Funktion von der undoLastAction Funktion aufgerufen wird, wird nicht in die actionList eingetragen
                     //sondern in die reversedActionList
@@ -928,13 +1047,13 @@ namespace _2DAG_Designer
 
                     case ActionType.Draw:
                         {
-                            UndrawlastObject();
+                            //UndrawlastObject();
                         }
                         break;
 
                     case ActionType.Restore:
                         {
-                            UndrawlastObject();
+                            //UndrawlastObject();
                         }
                         break;
 
@@ -990,13 +1109,13 @@ namespace _2DAG_Designer
 
                     case ActionType.Draw:
                         {
-                            UndrawlastObject();
+                            //UndrawlastObject();
                         }
                         break;
 
                     case ActionType.Restore:
                         {
-                            UndrawlastObject();
+                            //UndrawlastObject();
                         }
                         break;
 
@@ -1081,9 +1200,17 @@ namespace _2DAG_Designer
             // Markierung des ausgewählten Punkts
             SelectedPointBorder.Visibility = Visibility.Visible;
 
-            // Position der Markierung ist das Ende des entsprechenden Objekts
-            var position = DrawList[SelectedPointIndex].GetEnd();
-            SelectedPointBorder.Margin = new Thickness(position.X - 5, position.Y - 5, 0, 0);
+            try
+            {
+                // Position der Markierung ist das Ende des entsprechenden Objekts
+                var position = DrawList[SelectedPointIndex].GetEnd();
+                SelectedPointBorder.Margin = new Thickness(position.X - 5, position.Y - 5, 0, 0);
+            }
+            catch
+            {
+                // bei fehlern, wird die Markierung unsichtbar
+                SelectedPointBorder.Visibility = Visibility.Hidden;
+            }
 
             // Markierung in den Vordergrund
             DrawField.Children.Remove(SelectedPointBorder);
@@ -1098,11 +1225,11 @@ namespace _2DAG_Designer
             try
             {
                 //Breite und Höhe werden in von Pixel in cm umgerechnet
-                double width   = PixelToCentimeter(DrawList.Last().Width);
-                double height  = PixelToCentimeter(DrawList.Last().Height);
-                
+                double width = PixelToCentimeter(DrawList.Last().Width);
+                double height = PixelToCentimeter(DrawList.Last().Height);
+
                 // Winkel wird auf 2 Nachkommastellen gerundet
-                double angle   = Math.Round(DrawList.Last().Angle, 2);
+                double angle = Math.Round(DrawList.Last().Angle, 2);
 
                 if (angle == 360)
                     angle = 0;
@@ -1112,7 +1239,7 @@ namespace _2DAG_Designer
                     width = -width;
                 if (height < 0)
                     height = -height;
-                
+
                 //die Werte werden in den Textlabeln angezeigt
                 WidthLabel.Content = "Breite: " + (Math.Round(width, 2)) + "cm";
                 HeightLabel.Content = "Höhe: " + (Math.Round(height, 2)) + "cm";
@@ -1124,7 +1251,7 @@ namespace _2DAG_Designer
                     AngleLabel.Content = "Winkel: " + angle + "°";
 
                     //Bei einer Linie wird der Winkel in Klammern angezeigt, da er hier nich so wichtig sit
-                    if(DrawList.Last().GetType() == typeof(DrawLine))
+                    if (DrawList.Last().GetType() == typeof(DrawLine))
                     {
                         AngleLabel.Content = "(" + AngleLabel.Content + ")";
                     }
@@ -1138,7 +1265,7 @@ namespace _2DAG_Designer
                 WidthLabel.Content = "";
                 HeightLabel.Content = "";
                 AngleLabel.Content = "";
-            }           
+            }
         }
 
         /// <summary>
@@ -1208,11 +1335,11 @@ namespace _2DAG_Designer
                 {
                     //Linie von X1, Y1
                     X1 = 0,
-                    Y1 = i * (DrawRow.ActualHeight / 15),
+                    Y1 = i * (DrawRowSize / 15),
 
                     //zu X2, Y2
-                    X2 = DrawColumn.ActualWidth,
-                    Y2 = i * (DrawRow.ActualHeight / 15),
+                    X2 = DrawRowSize,
+                    Y2 = i * (DrawRowSize / 15),
 
                     Stroke = Brushes.Gray,         //Farbe der Linie wird festgelegt
                     StrokeThickness = 2
@@ -1224,7 +1351,7 @@ namespace _2DAG_Designer
                 {
                     Content = i,
 
-                    Margin = new Thickness((i * (DrawRow.ActualHeight / 15)) - 10, 15, 0, 0),
+                    Margin = new Thickness((i * (DrawRowSize / 15)) - 10, 15, 0, 0),
                 };
                 XLabelCanvas.Children.Add(Label);
             }
@@ -1235,11 +1362,11 @@ namespace _2DAG_Designer
                 {
                     //Linie von X1, Y1
                     X1 = 0,
-                    Y1 = i * (DrawRow.ActualHeight / 150),
+                    Y1 = i * (DrawRowSize / 150),
 
                     //zu X2, Y2
-                    X2 = DrawColumn.ActualWidth,
-                    Y2 = i * (DrawRow.ActualHeight / 150),
+                    X2 = DrawRowSize,
+                    Y2 = i * (DrawRowSize / 150),
 
                     Stroke = Brushes.LightSlateGray,         //Farbe der Linie wird festgelegt
                     StrokeThickness = 0.7
@@ -1255,12 +1382,12 @@ namespace _2DAG_Designer
                 var Line = new Line()
                 {
                     //Linie von X1, Y1
-                    X1 = i * (DrawColumn.ActualWidth / 15),
+                    X1 = i * (DrawRowSize / 15),
                     Y1 = 0,
 
                     //zu X2, Y2
-                    X2 = i * (DrawColumn.ActualWidth / 15),
-                    Y2 = DrawRow.ActualHeight,
+                    X2 = i * (DrawRowSize / 15),
+                    Y2 = DrawRowSize,
 
                     Stroke = Brushes.Gray,         //Farbe der Linie wird festgelegt
                     StrokeThickness = 2
@@ -1273,7 +1400,7 @@ namespace _2DAG_Designer
                     Content = i,
 
 
-                    Margin = new Thickness( YLabelCanvas.ActualWidth - 20, (i * (DrawRow.ActualHeight / 15)) - 10, 0, 0),
+                    Margin = new Thickness(YLabelCanvas.ActualWidth - 20, (i * (DrawRowSize / 15)) - 10, 0, 0),
 
                     //nach oben und nach links gebunden
                 };
@@ -1286,12 +1413,12 @@ namespace _2DAG_Designer
                 var Line = new Line()
                 {
                     //Linie von X1, Y1
-                    X1 = i * (DrawColumn.ActualWidth / 150),
+                    X1 = i * (DrawRowSize / 150),
                     Y1 = 0,
 
                     //zu X2, Y2
-                    X2 = i * (DrawColumn.ActualWidth / 150),
-                    Y2 = DrawRow.ActualHeight,
+                    X2 = i * (DrawRowSize / 150),
+                    Y2 = DrawRowSize,
 
                     Stroke = Brushes.LightSlateGray,         //Farbe der Linie wird festgelegt
                     StrokeThickness = 0.7
@@ -1315,27 +1442,40 @@ namespace _2DAG_Designer
             DrawAreaLines();
 
             //damit die Labels zurück gesetzt werden
-            Measure();  
+            Measure();
         }
 
-        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+        private void DrawArea_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             //man kann die größe des Fensters nur verändern, wenn noch nichts gezeichnet wurde!
             if (FirstDraw)
             {
-                //Seitenverhältnis wird beibehalten und Werte werden abgespeichert
-                WindowWidth = Application.Current.MainWindow.Width = Application.Current.MainWindow.Height * 1.5;
-                WindowHeight = Application.Current.MainWindow.Height;
+                // Wenn das Fenster maximiert ist
+                if (Application.Current.MainWindow.WindowState == WindowState.Maximized)
+                {
+                    WindowHeight = SystemParameters.MaximizedPrimaryScreenHeight;
+                    WindowWidth = SystemParameters.MaximizedPrimaryScreenWidth;
+                }
+                else
+                {
+                    // Fenstergröße wird abgespeichert
+                    WindowWidth = Application.Current.MainWindow.Width;
+                    WindowHeight = Application.Current.MainWindow.Height;
+                }
 
-                //DrawRow und Column sind immer gleich groß
-                DrawRow.Height = new GridLength(Application.Current.MainWindow.Height * 0.85);
-                DrawColumn.Width = DrawRow.Height;
+                // DrawRowSize wird abgespeichert
+                DrawRowSize = e.NewSize.Width;
 
-                //DrawRowSize wird abgespeichert
-                DrawRowSize = DrawRow.ActualHeight;
+                // Seitenverhältnis des Zeichenbereichs 1:1
+                DrawRow.Height = new GridLength(e.NewSize.Width);
 
-                //AreaLines werden neu gezeichnet
-                DrawAreaLines();
+                App.Current.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Normal, new Action(() =>
+                {
+                    //AreaLines werden neu gezeichnet
+                    DrawAreaLines();
+
+                }));
+
             }
             else
             {

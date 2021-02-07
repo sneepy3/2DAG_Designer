@@ -45,11 +45,11 @@ namespace _2DAG_Designer.DrawingObjects.Groups
                     filepath += letter + ".txt";
                 }
 
-                //Objekte des Buchstabens werden der Liste hinzugefügt
+                //Objekte des Buchstabens werden abgespeichert
                 var letterObjectList = DrawFile.ListFromFile(filepath);
 
                 //Position wird für jedes Objekt berechnet
-                foreach (var drawObject in letterObjectList)
+                foreach (DrawObject drawObject in letterObjectList)
                 {
                     var index = letterObjectList.IndexOf(drawObject);
 
@@ -79,10 +79,10 @@ namespace _2DAG_Designer.DrawingObjects.Groups
                     drawObject.CalculateEnd();
 
                     drawObject.Redraw();
-                }
 
-                //Liste des Buchstabens wird der Liste des gesamten Wortes hinzugefügt
-                this.ContainingObjects.AddRange(letterObjectList);
+                    // Objekt wird der Objektliste des DrawWords hinzugefügt
+                    ContainingObjects.Add(drawObject);
+                }
             }
 
             //Start und Endpunkt wird abgespeichert

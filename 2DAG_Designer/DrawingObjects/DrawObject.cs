@@ -33,10 +33,12 @@ namespace _2DAG_Designer.DrawingObjects
                 /// </summary>
                 Size,
                 Angle,
-            }
 
-        //Farbe
-        public SolidColorBrush Color { get; set;}
+                /// <summary>
+                /// Kreis invertieren
+                /// </summary>
+                Invert,
+            }
 
         //tatsächliches Objekt, das angezeigt werden soll
         public UIElement ThisObject;
@@ -209,21 +211,20 @@ namespace _2DAG_Designer.DrawingObjects
         public void SetStart(Point start)
         {
             ObjectStart = start;
+            Redraw();
         }
 
         public void SetEnd(Point end)
         {
             ActualObjectEnd = end;
+            Redraw();
         }
 
         public abstract string[] GetInformationString();
 
-        public static DrawObject GetObjectFromString(string s)
+        public static DrawObject GetObjectFromString(string s, Point lastEndPoint)
         {
-
             var informations = new Dictionary<ObjectInformation, string>();
-
-
 
             //einzelne Daten werden in einem StringArray abgespeichert
             string[] data = s.Split('/');
@@ -252,61 +253,40 @@ namespace _2DAG_Designer.DrawingObjects
                             MainWindow.CentimeterTopixel(Double.Parse(informations.GetObjectInformation(ObjectInformation.endX))),
                             MainWindow.CentimeterTopixel(Double.Parse(informations.GetObjectInformation(ObjectInformation.endY))));
 
-            //Farbe
-            var color = (SolidColorBrush)new BrushConverter().
-                           ConvertFromString(informations.GetObjectInformation(ObjectInformation.color));
-
-            //Breite
-            var width = double.Parse(informations.GetObjectInformation(ObjectInformation.width));
-
-            //Höhe
-            var height = double.Parse(informations.GetObjectInformation(ObjectInformation.height));
-
-            //Winkel
-            var angle = double.Parse(informations.GetObjectInformation(ObjectInformation.angle));
-
             DrawObject newObject = null;
 
             switch (objectType)
             {
                 case ObjectTypes.Line:
                     {
-                        //ende des letzen Objekts ist der Start der Linie
-                        newObject = new DrawLine(MainWindow.DrawList.Last().GetEnd(), endPoint, color, false);
+                        var lineMode = (DrawLine.LineMode)Enum.Parse(typeof(DrawLine.LineMode), informations.GetObjectInformation(ObjectInformation.lineMode));
 
+                        //ende des letzen Objekts ist der Start der Linie
+                        newObject = new DrawLine(lastEndPoint, endPoint, lineMode, false);
                     }
                     break;
                 case ObjectTypes.Ellipse:
                     {
-                        newObject = new DrawEllipse(endPoint, width, height, color, false);
+                        //Breite
+                        var width = double.Parse(informations.GetObjectInformation(ObjectInformation.width));
+
+                        //Höhe
+                        var height = double.Parse(informations.GetObjectInformation(ObjectInformation.height));
+
+                        newObject = new DrawEllipse(endPoint, width, height, false);
                     }
                     break;
                 case ObjectTypes.Arc:
                     {
-                        //var keepHeight = bool.Parse(informations.GetObjectInformation(ObjectInformation.keepHeight));
+                        var radius = double.Parse(informations.GetObjectInformation(ObjectInformation.radius));
 
-                        //DrawArc newArc;
+                        var circleSizeAngle = double.Parse(informations.GetObjectInformation(ObjectInformation.circleSizeAngle));
+                        
+                        var startAngle = double.Parse(informations.GetObjectInformation(ObjectInformation.startAngle));
 
-                        ////Wenn höhe beibehalten werden soll,
-                        //if (keepHeight)
-                        //{
-                        //    //wird der Bogen ohne Endpunkt erstellt
-                        //    newArc = new DrawArc(MainWindow.DrawList.Last().GetEnd(), width, height, angle, color);
-                        //}
-                        //else
-                        //{
-                        //    //sonst wird er mit Endpunkt erstellt
-                        //    newArc = new DrawArc(MainWindow.DrawList.Last().GetEnd(), endPoint, color, false);
-                        //}
+                        var isInverted = Boolean.Parse(informations.GetObjectInformation(ObjectInformation.inverted));
 
-                        //newArc.ArcInverted = bool.Parse(informations.GetObjectInformation(ObjectInformation.inverted));
-
-                        ////ist der Bogen invertiert, wird er erneut gezeichnet
-                        //if (newArc.ArcInverted)
-                        //    newArc.Redraw();
-
-                        //newObject = newArc;
-
+                        newObject = new DrawCircle(lastEndPoint, radius, circleSizeAngle, startAngle, isInverted);
                     }
                     break;
                 default:

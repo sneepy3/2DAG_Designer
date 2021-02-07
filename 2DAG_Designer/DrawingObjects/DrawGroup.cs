@@ -89,11 +89,13 @@ namespace _2DAG_Designer.DrawingObjects
         public void SetStart(Point start)
         {
             GroupStart = start;
+            Redraw();
         }
 
         public void SetEnd(Point end)
         {
             GroupEnd = end;
+            Redraw();
         }
 
         public void AddToCanvas()

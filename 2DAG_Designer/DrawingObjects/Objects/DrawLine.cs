@@ -19,9 +19,26 @@ namespace _2DAG_Designer.DrawingObjects.Objects
 {
     class DrawLine : DrawObject
     {   
+        public enum LineMode
+        {
+            /// <summary>
+            /// Linie wird normal gezeichnet
+            /// </summary>
+            Normal,
+
+            /// <summary>
+            /// Linie wird schneller gezeichnet, dient als freier Platz
+            /// </summary>
+            Space,
+        }
+
+        private Brush color;
+
+        public LineMode Mode;
+
         #region Constructor
 
-        public DrawLine (Point startPoint, Point endPoint, SolidColorBrush color, bool roundEnd)
+        public DrawLine (Point startPoint, Point endPoint, LineMode mode, bool roundEnd)
         {
             //Start und Endpunkt des neuen Objekts wird festgelegt
             this.ObjectStart = startPoint;
@@ -37,7 +54,12 @@ namespace _2DAG_Designer.DrawingObjects.Objects
             //Winkel wird abgespeichert
             GetAngle();
 
-            this.Color = color;
+            this.Mode = mode;
+
+            if (mode == LineMode.Normal)
+                color = Brushes.Black;
+            else
+                color = Brushes.LightSlateGray;
 
             //neue Linie wird erstellt
             ThisObject = new Line()
@@ -53,9 +75,6 @@ namespace _2DAG_Designer.DrawingObjects.Objects
                 Stroke = color,         //Farbe der Linie wird festgelegt
                 StrokeThickness = 2     // Dicke: 2
             };
-
-            //neues Object wird der Liste hinzugefügt
-            MainWindow.DrawList.Add(this);
 
             //Objekt wird zum Canvas hinzugefügt
             MainWindow.ThisWindow.AddToCanvas(this.ThisObject);            
@@ -80,7 +99,7 @@ namespace _2DAG_Designer.DrawingObjects.Objects
             thisObject.Y2 = ActualObjectEnd.Y;
 
             //Farbe der Linie wird festgelegt
-            thisObject.Stroke = Color;   
+            thisObject.Stroke = color;   
             
             // Dicke: 2
             thisObject.StrokeThickness = 2;   
@@ -158,8 +177,8 @@ namespace _2DAG_Designer.DrawingObjects.Objects
             line[0] += ObjectInformation.endX.InformationToString(MainWindow.PixelToCentimeter(GetEnd().X));
             line[0] += ObjectInformation.endY.InformationToString(MainWindow.PixelToCentimeter(GetEnd().Y));
 
-            //Farbe
-            line[0] += ObjectInformation.color.InformationToString(Color);
+            // LinienModus
+            line[0] += ObjectInformation.lineMode.InformationToString(Mode);
 
             //string mit den Informationen des Objekts wird zurückgegeben
             return line;

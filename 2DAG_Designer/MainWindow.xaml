@@ -6,7 +6,9 @@
         xmlns:local="clr-namespace:_2DAG_Designer"
         mc:Ignorable="d"
         ResizeMode="CanResize"
-        Title="2DAG Designer" Height="700" Width="1050" MinHeight="650" MinWidth="930" KeyDown="Window_KeyDown" Unloaded="Window_Unloaded" Loaded="Window_Loaded" SizeChanged="Window_SizeChanged">
+        Title="2DAG Designer" Height="700" Width="1050" MinHeight="650" MinWidth="930" 
+        KeyDown="Window_KeyDown" KeyUp="Window_KeyUp"
+        Unloaded="Window_Unloaded" Loaded="Window_Loaded">
 
     <Window.Resources>
         <Style TargetType="{x:Type Control}" x:Key="fontStyle">
@@ -181,16 +183,15 @@
         <Grid ShowGridLines="False" >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*" />
-                <ColumnDefinition Width="595" x:Name="DrawColumn" />
-                <ColumnDefinition Width="200" />
-                <ColumnDefinition Width="20" />
+                <ColumnDefinition Width="3*" x:Name="DrawColumn"/>
+                <ColumnDefinition Width="1*" />
             </Grid.ColumnDefinitions>
 
             <Grid.RowDefinitions>
                 <RowDefinition Height="0.5*" />
-                <RowDefinition Height="40"/>
-                <RowDefinition Height="595" x:Name="DrawRow" />
-                <RowDefinition Height="*" />
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="3*" x:Name="DrawRow" />
+                <RowDefinition Height="1*" />
             </Grid.RowDefinitions>
 
 
@@ -200,26 +201,7 @@
             </Canvas>
            
 
-            <!--Überdeckung für überstehende Objekte-->
-            <Rectangle Grid.Row="0" Grid.Column="0" Fill="White" />
-            <Rectangle Grid.Row="1" Grid.Column="0" Fill="White" />
-            <Rectangle Grid.Row="2" Grid.Column="0" Fill="White" />
-            <Rectangle Grid.Row="3" Grid.Column="0" Fill="White" />
-
-            <Rectangle Grid.Row="0" Grid.Column="1" Fill="White" />
-            <Rectangle Grid.Row="1" Grid.Column="1" Fill="White" />
-            <Rectangle Grid.Row="3" Grid.Column="1" Fill="White" />
-
-            <Rectangle Grid.Row="0" Grid.Column="2" Fill="White" />
-            <Rectangle Grid.Row="1" Grid.Column="2" Fill="White" />
-            <Rectangle Grid.Row="2" Grid.Column="2" Fill="White" />
-            <Rectangle Grid.Row="3" Grid.Column="2" Fill="White" />
-
-            <Rectangle Grid.Row="0" Grid.Column="3" Fill="White" />
-            <Rectangle Grid.Row="1" Grid.Column="3" Fill="White" />
-            <Rectangle Grid.Row="2" Grid.Column="3" Fill="White" />
-            <Rectangle Grid.Row="3" Grid.Column="3" Fill="White" />
-
+        
 
             <!--Vor und Zurück Buttons-->
             <Button x:Name="Reverse" Style="{StaticResource NoTriggerButtonStyle}" Height="40" Width="40" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center" Margin="-40,0,0,0" Click="Reverse_Click" BorderBrush="{x:Null}"  >
@@ -235,12 +217,11 @@
             <!---->
 
             <!--StackPanel für die Steuerung auf der linken Seite-->
-            <StackPanel  Grid.Row="2" HorizontalAlignment="Center" >
+            <StackPanel MaxWidth="200" Grid.Row="2" HorizontalAlignment="Stretch" Margin="10 0">
                 
                 <!--Arduino-->
                 <Border 
-                    Margin="0 10"
-                    Width="186">
+                    Margin="0 10">
                     
                     <StackPanel>
                         <Button x:Name="SearchPortsButton" Content="Ports suchen" Click="SearchPortsButton_Click" Margin="10" />
@@ -258,7 +239,7 @@
                     </StackPanel>
                 </Border>
 
-                <Button x:Name="Schrittmotor" Visibility="Visible" Content="Schrittmotor" Click="Schrittmotor_Click" Margin="0 50" />
+                <Button x:Name="Schrittmotor" Visibility="Visible" Content="Schrittmotor" Click="Schrittmotor_Click" Margin="0 20" />
 
                 <!--verschieben-->
                 <Border>
@@ -329,6 +310,13 @@
                         </Button>
                     </Grid>
                 </Border>
+
+                <Border Margin="0 10">
+                    <StackPanel Orientation="Horizontal">
+                        <Label Content="Modus: " />
+                        <Label x:Name="DrawModeLabel"  />
+                    </StackPanel>
+                </Border>
             </StackPanel>
 
 
@@ -337,6 +325,8 @@
                     Grid.Column="1" Grid.Row="2" 
                     Click="DrawArea_Click"  
                     PreviewMouseLeftButtonDown="DrawArea_MouseDown"
+                    MouseRightButtonDown="DrawArea_MouseRightButtonDown"
+                    SizeChanged="DrawArea_SizeChanged"
                     Style="{StaticResource NoTriggerButtonStyle}"
                     Opacity="0.2"/>
 
@@ -347,16 +337,16 @@
 
 
             <!--StackPanel für die Steuerung auf der rechten Seite-->
-            <StackPanel Grid.Column="2"  Grid.Row="2" HorizontalAlignment="Left" Height="585"  VerticalAlignment="Top" Width="200" Orientation="Vertical">
+            <StackPanel Margin="10 0" Grid.Column="2"  Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Top" Orientation="Vertical">
 
                 <!--Buttons zur Steuerung-->
-                <Border Grid.Row="2" Grid.Column="2"   Margin="10 0">
+                <Border Grid.Row="2" Grid.Column="2">
                     <StackPanel >
                         <Button x:Name="DeleteAllButton" ToolTip="alles Löschen"    Content="delete ALL"   Margin="0 10"   Height="30" Width="100" Click="DeleteAllButton_Click"  />
-                        <Button x:Name="DeleteButton"       Content="delete Last"  Margin="0 10"   Height="30" Width="100" Click="DeleteButton_Click" />
+                        <Button x:Name="DeleteButton"       Content="entfernen"  Margin="0 10"   Height="30" Width="100" Click="DeleteButton_Click" />
                     </StackPanel>
                 </Border>
-                <Border   Margin="10 5">
+                <Border   Margin="0 5">
                     <Grid Margin="10 10">
                         <Grid.ColumnDefinitions >
                             <ColumnDefinition Width="*" />
@@ -371,7 +361,7 @@
                 <!--gerade/rund Checkboxen-->
 
                 <!--Halbkreis erstellen-->
-                <Border Grid.Row="2" Grid.Column="2"   Margin="10 0" >
+                <Border Grid.Row="2" Grid.Column="2"   Margin="0 0" >
                     <StackPanel>
 
 
@@ -395,7 +385,7 @@
                 </Border>
 
                 <!-- Informationsanzeige-->
-                <Border Grid.Row="2" Grid.Column="2"   Margin="10 5">
+                <Border Grid.Row="2" Grid.Column="2"   Margin="0 5">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <Label x:Name="WidthLabel"  Grid.Column="0" Content="width" HorizontalAlignment="Left"  VerticalAlignment="Center" Margin="10,0,0,0" />
@@ -408,7 +398,7 @@
                 </Border>
 
                 <!--Wort einfügen-->
-                <Border Grid.Row="2" Grid.Column="2"   Margin="10 0">
+                <Border Grid.Row="2" Grid.Column="2"   Margin="0 0">
                     <StackPanel>
                         <Label Content="Wort einfügen:" HorizontalAlignment="Center" />
                         <TextBox x:Name="DrawLettersTextBox" Text="" Height="24" Width="120" TextWrapping="Wrap"  HorizontalAlignment="Center" VerticalAlignment="Top" />
@@ -417,7 +407,7 @@
                 </Border>
 
                 <!--Größe verändern-->
-                <Border Grid.Row="2" Grid.Column="2" Margin="10 5">
+                <Border Grid.Row="2" Grid.Column="2" Margin="0 5">
                     <Grid Margin="10 0">
                         <Grid.RowDefinitions>
                             <RowDefinition  Height="*"/>

@@ -23,7 +23,7 @@ namespace _2DAG_Designer.DrawingObjects.Objects
         /// <summary>
         /// Constructor
         /// </summary>
-        public DrawEllipse (Point position, double width, double height, SolidColorBrush color, bool roundEnd)
+        public DrawEllipse (Point position, double width, double height, bool roundEnd)
         {
             //Werte werden festgelegt
             this.ActualObjectEnd = position;
@@ -36,8 +36,6 @@ namespace _2DAG_Designer.DrawingObjects.Objects
 
             this.Width = width;
             this.Height = height;
-            
-            this.Color = color;
 
             //neue Ellipse wird erstellt
             ThisObject = new Ellipse()
@@ -47,7 +45,7 @@ namespace _2DAG_Designer.DrawingObjects.Objects
                 Height = width,
 
                 //Farbe
-                Fill = color,
+                Fill = Brushes.Black,
 
                 //nach oben und nach links gebunden
                 HorizontalAlignment = HorizontalAlignment.Left,
@@ -56,9 +54,6 @@ namespace _2DAG_Designer.DrawingObjects.Objects
                 //Position, Hälfte der Höhe/Breite wird abgezogen, damit die Ellipse in der Mitte ist
                 Margin = new Thickness(ActualObjectEnd.X - (width / 2), ActualObjectEnd.Y - (height / 2), 0, 0)
             };
-
-            //neues Object wird der Liste hinzugefügt
-            MainWindow.DrawList.Add(this);
 
             //Objekt wird zum Canvas hinzugefügt
             MainWindow.ThisWindow.AddToCanvas(this.ThisObject);
@@ -83,7 +78,7 @@ namespace _2DAG_Designer.DrawingObjects.Objects
                 Width = this.Width,
                 Height = this.Height,
                 //Farbe
-                Fill = Color,
+                Fill = Brushes.Black,
 
                 //nach oben und nach links gebunden
                 HorizontalAlignment = HorizontalAlignment.Left,
@@ -130,9 +125,6 @@ namespace _2DAG_Designer.DrawingObjects.Objects
             //Breite, Höhe
             line[0] += ObjectInformation.width.InformationToString(Width);
             line[0] += ObjectInformation.height.InformationToString(Height);
-
-            //Farbe
-            line[0] += ObjectInformation.color.InformationToString(Color);
 
             //string mit den Informationen des Objekts wird zurückgegeben
             return line;

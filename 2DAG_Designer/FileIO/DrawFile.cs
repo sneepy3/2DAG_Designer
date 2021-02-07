@@ -29,8 +29,8 @@ namespace _2DAG_Designer.FileIO
             endX,
             endY,
 
-            color,
             angle,
+            lineMode,
 
             width,
             height,
@@ -72,10 +72,10 @@ namespace _2DAG_Designer.FileIO
             File.WriteAllLines(filepath, lines);
         }
 
-        public static List<DrawObject> ListFromFile(string filepath)
+        public static List<IDrawable> ListFromFile(string filepath)
         {
             //Liste der Objekte
-            var list = new List<DrawObject>();
+            var list = new List<IDrawable>();
 
             //alle Linien aus der Textdatei werden abgespeichert
             var allLines = File.ReadAllLines(filepath);
@@ -85,8 +85,13 @@ namespace _2DAG_Designer.FileIO
             {
                 try
                 {
+                    var lastEnd = new Point();
+
+                    if (list.Count > 0)
+                        lastEnd = list.Last().GetEnd();
+
                     //neues Objekt wird erstellt und der Liste hinzugefügt
-                    list.Add(DrawObject.GetObjectFromString(line));
+                    list.Add(DrawObject.GetObjectFromString(line, lastEnd));
                 }
                 catch
                 {}
@@ -179,28 +184,24 @@ namespace _2DAG_Designer.FileIO
         /// </summary>
         private static string LoadDefaultValue(this ObjectInformation informationType)
         {
-            if(informationType == ObjectInformation.objectType)
+            if (informationType == ObjectInformation.objectType)
             {
                 //der Objekt Typ muss angegeben werden
                 throw new Exception();
             }
 
             //Zahlenwerte sind standartmäßig 0
-            else if((informationType == ObjectInformation.endX) ||
-                (informationType == ObjectInformation.endY) ||
-                (informationType == ObjectInformation.angle) ||
-                (informationType == ObjectInformation.width) ||
-                (informationType == ObjectInformation.height))
+            else if ((informationType == ObjectInformation.endX)
+                || (informationType == ObjectInformation.endY)
+                || (informationType == ObjectInformation.angle)
+                || (informationType == ObjectInformation.width)
+                || (informationType == ObjectInformation.height))
             {
                 return "0";
             }
 
-            //Farbe
-            else if (informationType == ObjectInformation.color)
-            {
-                //schwarz
-                return "#FF000000";
-            }
+            else if (informationType == ObjectInformation.lineMode)
+                return "Normal";
 
             //bool
             else if (informationType == ObjectInformation.inverted)

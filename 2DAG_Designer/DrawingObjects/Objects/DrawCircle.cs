@@ -43,8 +43,7 @@ namespace _2DAG_Designer.DrawingObjects.Objects
         /// <summary>
         /// Constructor
         /// </summary>
-        public DrawCircle(Point startPoint, double radius, double circleSizeAngle,  double startAngle, bool inverted,
-            SolidColorBrush color)
+        public DrawCircle(Point startPoint, double radius, double circleSizeAngle,  double startAngle, bool inverted)
         {
             #region Werte abspeichern
 
@@ -56,10 +55,6 @@ namespace _2DAG_Designer.DrawingObjects.Objects
 
             //Radius des Kreises
             this.Radius = radius;
-         
-
-            //Farbe und Winkel festgelegt
-            this.Color = color;
 
             //Größe des Kreises
             this.CircleSizeAngle = circleSizeAngle;
@@ -84,12 +79,8 @@ namespace _2DAG_Designer.DrawingObjects.Objects
             //Breite und Höhe werden berechnet
             GetMeasures();
                         
-
             //neuer Pfad wird mit den Werten erstellt
             CreatePath();
-
-
-            MainWindow.DrawList.Add(this);
 
             //Objekt wird zum Canvas hinzugefügt
             MainWindow.ThisWindow.AddToCanvas(this.ThisObject);
@@ -219,7 +210,20 @@ namespace _2DAG_Designer.DrawingObjects.Objects
         {
             //Wenn kein ganzer Kreis angezeigt wird, können Änderungen vorgenommen werden
             if(CircleSizeAngle != 360)
+            {
+                switch(edit)
+                {
+                    case EditObject.Invert:
+                        {
+                            IsInverted = !IsInverted;
+
+                            Redraw();
+                        }break;
+                }
+
                 base.Edit(edit);
+            }
+
         }
 
         public override void Edit(EditObject edit, double factor)
@@ -355,9 +359,6 @@ namespace _2DAG_Designer.DrawingObjects.Objects
             // Endpunkt
             line[0] += ObjectInformation.endX.InformationToString(MainWindow.PixelToCentimeter(GetEnd().X));
             line[0] += ObjectInformation.endY.InformationToString(MainWindow.PixelToCentimeter(GetEnd().Y));
-
-            // Farbe
-            line[0] += ObjectInformation.color.InformationToString(Color);
 
             // CircleSizeAngle
             line[0] += ObjectInformation.circleSizeAngle.InformationToString(CircleSizeAngle);
