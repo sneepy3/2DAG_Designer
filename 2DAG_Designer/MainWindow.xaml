@@ -342,7 +342,7 @@
                 <!--Buttons zur Steuerung-->
                 <Border Grid.Row="2" Grid.Column="2">
                     <StackPanel >
-                        <Button x:Name="DeleteAllButton" ToolTip="alles Löschen"    Content="delete ALL"   Margin="0 10"   Height="30" Width="100" Click="DeleteAllButton_Click"  />
+                        <Button x:Name="DeleteAllButton" ToolTip="alles Löschen"    Content="Alles entfernen"   Margin="0 10"   Height="30" Width="100" Click="DeleteAllButton_Click"  />
                         <Button x:Name="DeleteButton"       Content="entfernen"  Margin="0 10"   Height="30" Width="100" Click="DeleteButton_Click" />
                     </StackPanel>
                 </Border>

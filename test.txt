@@ -1,5 +1,2 @@
-objectType:Ellipse/endX:1,5/endY:7/width:4/height:4/
-objectType:Line/endX:3,5/endY:2,5/lineMode:Normal/
-objectType:Arc/endX:7,91738470680524/endY:1,23020491807225/circleSizeAngle:100/startAngle:293,962488974578/radius:119/inverted:False/
-objectType:Arc/endX:9,26468106213911/endY:0,992640219616707/circleSizeAngle:40/startAngle:10/radius:79,3333333333333/inverted:True/
-objectType:Line/endX:6/endY:4/lineMode:Normal/
+objectType:Ellipse/endX:6/endY:6,5/width:4/height:4/
+objectType:Line/endX:10,5/endY:4/lineMode:Normal/

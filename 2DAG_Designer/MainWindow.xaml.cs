@@ -129,8 +129,11 @@ namespace _2DAG_Designer
         double WindowHeight;
         double WindowWidth;
 
-        //true wenn Linien gezeichnet werden, false wenn Bögen gezeichnet werden
+        //true wenn Linien gezeichnet werden, false wenn Kreise gezeichnet werden
         bool DrawLines = true;
+
+        // true, wenn alle Änderungen gespeichert wurden
+        bool AllChangesSaved = true;
 
         #endregion
         //-------------------------------------------------
@@ -173,6 +176,9 @@ namespace _2DAG_Designer
 
                 FirstDraw = false;
 
+                // es gibt keine ungespeicherten Änderungen
+                AllChangesSaved = true;
+
                 //Aktion wird hinzugefüt
                 ActionList.Add(ActionType.RestoreAll);
             }
@@ -199,6 +205,9 @@ namespace _2DAG_Designer
                 if (_currentFilePath != "")
                     //Objekte werden abgespeichert
                     DrawFile.SaveToFile(_currentFilePath);
+
+                // Änderungen wurden gespeichert
+                AllChangesSaved = true;
             }
             catch
             {
@@ -219,6 +228,9 @@ namespace _2DAG_Designer
                 if (_currentFilePath != "")
                     //Datei wird gespeichert
                     DrawFile.SaveToFile(_currentFilePath);
+
+                // Änderungen wurden gespeichert
+                AllChangesSaved = true;
             }
             catch
             {
@@ -294,6 +306,21 @@ namespace _2DAG_Designer
 
         private void DeleteAllButton_Click(object sender, RoutedEventArgs e)
         {
+            // Wenn es nicht gespeicherte Änderungen gibt, 
+            if(!AllChangesSaved)
+            {
+                // MessageBox Abfrage, ob alles gelöscht werden soll, ohne zu speichern
+                var buttons = MessageBoxButton.YesNo;
+                var result = MessageBox.Show("Möchten Sie alles entfernen ohne zu speichern?", "Entfernen?", buttons);
+
+                // bei nein, wird nichts gelöscht
+                if(result == MessageBoxResult.No)
+                {
+                    return;
+                }
+            }
+
+            // alle Objekte werden gelöscht
             UndrawallObjects();
         }
 
@@ -1158,11 +1185,17 @@ namespace _2DAG_Designer
         {
             //element wird zur objectCanvas hinzugefügt
             DrawField.Children.Add(element);
+
+            // es gibt ungespeicherte Änderungen
+            AllChangesSaved = false;
         }
 
         public void RemoveFromCanvas(UIElement element)
         {
             DrawField.Children.Remove(element);
+
+            // es gibt ungespeicherte Änderungen
+            AllChangesSaved = false;
         }
 
         private void RemoveAll()
@@ -1171,6 +1204,9 @@ namespace _2DAG_Designer
             {
                 drawObject.Remove();
             }
+
+            // es gibt ungespeicherte Änderungen
+            AllChangesSaved = false;
         }
 
         private void DrawAll()
@@ -1179,6 +1215,9 @@ namespace _2DAG_Designer
             {
                 drawObject.AddToCanvas();
             }
+
+            // es gibt ungespeicherte Änderungen
+            AllChangesSaved = false;
         }
 
         /// <summary>
