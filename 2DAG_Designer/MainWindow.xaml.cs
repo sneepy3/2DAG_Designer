@@ -1468,12 +1468,6 @@ namespace _2DAG_Designer
             }
         }
 
-        private void Window_Unloaded(object sender, RoutedEventArgs e)
-        {
-            // um die Applikation zu beenden
-            Application.Current.Shutdown();
-        }
-
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
 
@@ -1524,6 +1518,23 @@ namespace _2DAG_Designer
             }
         }
 
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            // Wenn es nicht gespeicherte Änderungen gibt
+            if(!AllChangesSaved)
+            {
+                // Wird abgefragt, ob beendet werden soll, ohne zu speichern
+                var result = MessageBox.Show("Beenden ohne zu speichern?", "Beenden", 
+                    MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No);
+
+                // wenn nein ausgewählt wird
+                if(result == MessageBoxResult.No)
+                {
+                    // wird der Vorgang abgebrochen und das Programm wird nicht geschlossen
+                    e.Cancel = true;
+                }
+            }
+        }
 
         #endregion
         //-------------------------------------------------
