@@ -78,6 +78,11 @@ namespace _2DAG_Designer
             /// bestehendes Objekt bewegen
             /// </summary>
             Move,
+
+            /// <summary>
+            /// Linie zum Platzfreihalten zeichnen
+            /// </summary>
+            DrawSpace
         }
 
         #endregion
@@ -519,7 +524,12 @@ namespace _2DAG_Designer
                     // wenn Linien gezeichnet werden sollen
                     if (DrawLines)
                     {
-                        var newLine = new DrawLine(newObjectStart, newObjectEnd, DrawLine.LineMode.Normal, true);
+                        var lineMode = DrawLine.LineMode.Normal;
+
+                        if (drawMode == DrawMode.DrawSpace)
+                            lineMode = DrawLine.LineMode.Space;
+
+                        var newLine = new DrawLine(newObjectStart, newObjectEnd, lineMode, true);
 
                         // die Linie wird gezeichnet in schwarz
                         Draw(newLine, index);
@@ -802,8 +812,8 @@ namespace _2DAG_Designer
                 }
             }
 
-            // LEFT-CTRL
-            if(Keyboard.IsKeyDown(Key.LeftCtrl))
+            // LEFT-CTRL (Zeichenmodus bewegen, Funktionstaste)
+            if(e.Key == Key.LeftCtrl)
             {
                 // Zeichenmodus auf bewegen
                 drawMode = DrawMode.Move;
@@ -828,19 +838,25 @@ namespace _2DAG_Designer
 
                 //Speichern mit STRG + S
                 if (Keyboard.IsKeyDown(Key.S))
-            {
-                //Speichern
-                MenuSaveFile_Click(null, null);
+                {
+                    //Speichern
+                    MenuSaveFile_Click(null, null);
 
-                anyActionTriggered = true;
-            }
+                    anyActionTriggered = true;
+                }
             }
 
-            // LEFT.SHIFT
-            if(Keyboard.IsKeyDown(Key.LeftShift))
+            // LEFT.SHIFT (Zeichenmodus einfügen)
+            if(e.Key == Key.LeftShift)
             {
                 // Zeichenmodus auf einfügen
                 drawMode = DrawMode.Insert;
+            }
+
+            // I (Zeichenmodus Freier Platz einfügen)
+            if(e.Key == Key.I)
+            {
+                drawMode = DrawMode.DrawSpace;
             }
 
             //nur wenn eine der Aktionen durchgeführt wurde, werden die Maße angezeigt
@@ -851,7 +867,7 @@ namespace _2DAG_Designer
         private void Window_KeyUp(object sender, KeyEventArgs e)
         {
             // LEFT-CTRL oder LEFT-SHIFT
-            if(Keyboard.IsKeyUp(Key.LeftCtrl) || Keyboard.IsKeyUp(Key.LeftShift))
+            if (e.Key == Key.LeftCtrl || e.Key == Key.LeftShift|| e.Key == Key.I)
             {
                 // Zeichenmodus auf anhängen
                 drawMode = DrawMode.Append;
