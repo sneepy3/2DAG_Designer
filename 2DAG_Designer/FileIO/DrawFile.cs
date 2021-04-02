@@ -180,7 +180,7 @@ namespace _2DAG_Designer.FileIO
         }
 
         /// <summary>
-        /// gibt den Standartwert für den angegebenen Informationstyp zurück
+        /// gibt den Standardwert für den angegebenen Informationstyp zurück
         /// </summary>
         private static string LoadDefaultValue(this ObjectInformation informationType)
         {
@@ -190,7 +190,7 @@ namespace _2DAG_Designer.FileIO
                 throw new Exception();
             }
 
-            //Zahlenwerte sind standartmäßig 0
+            //Zahlenwerte sind standardmäßig 0
             else if ((informationType == ObjectInformation.endX)
                 || (informationType == ObjectInformation.endY)
                 || (informationType == ObjectInformation.angle)

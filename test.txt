@@ -1,2 +1,8 @@
-objectType:Ellipse/endX:6/endY:6,5/width:4/height:4/
-objectType:Line/endX:10,5/endY:4/lineMode:Normal/
+objectType:Ellipse/endX:2,5/endY:5,5/width:4/height:4/
+objectType:Arc/endX:6,87137330754352/endY:3,4825918762089/circleSizeAngle:180/startAngle:-114,773532852925/radius:99,5626355617407/inverted:False/
+objectType:Arc/endX:9,26499032882012/endY:5,7311411992263/circleSizeAngle:180/startAngle:-46,7899106082461/radius:67,9153885360306/inverted:False/
+objectType:Arc/endX:5,46905222437137/endY:5,56189555125726/circleSizeAngle:180/startAngle:92,5528981471717/radius:78,5779867392898/inverted:False/
+objectType:Arc/endX:4,69535783365571/endY:4,59477756286267/circleSizeAngle:180/startAngle:141,34019174591/radius:25,6124969497314/inverted:False/
+objectType:Arc/endX:7,0889748549323/endY:3,94197292069632/circleSizeAngle:180/startAngle:-105,255118703058/radius:51,3078941294612/inverted:False/
+objectType:Arc/endX:5,46905222437137/endY:4,35299806576402/circleSizeAngle:180/startAngle:75,7627195342389/radius:34,5615393175709/inverted:False/
+objectType:Arc/endX:7,06479690522244/endY:4,9816247582205/circleSizeAngle:180/startAngle:-68,4985656759521/radius:35,4682957019364/inverted:False/

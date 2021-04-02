@@ -643,7 +643,7 @@ namespace _2DAG_Designer
                 //Zeichenaktion wird hinzugefügt
                 ActionList.Add(ActionType.Draw);
 
-                //Standartfarbe
+                //Standardfarbe
                 ApplyTextButton.BorderBrush = Brushes.Gray;
             }
             catch
