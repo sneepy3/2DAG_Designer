@@ -703,6 +703,23 @@ namespace _2DAG_Designer
             }
         }
 
+        private void SpeedTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            int burnSpeed;
+
+            // Wenn die Texteingabe eine Zahl ist,
+            if(int.TryParse(SpeedTextBox.Text, out burnSpeed))
+            {
+                // bei gültiger Eingabe wird der Hintergrund weiß
+                SpeedTextBox.Background = Brushes.White;
+            }
+            else
+            {
+                // Wenn die Eingabe keine Zahl ist, wird sie rot hinterlegt
+                SpeedTextBox.Background = Brushes.Red;
+            }
+        }
+
         private void ArduinoUploadButton_Click(object sender, RoutedEventArgs e)
         {
             //Wenn eine Verbindung zum Arduino besteht
@@ -1551,6 +1568,7 @@ namespace _2DAG_Designer
                 }
             }
         }
+
 
         #endregion
         //-------------------------------------------------
