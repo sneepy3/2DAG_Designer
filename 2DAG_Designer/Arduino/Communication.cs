@@ -21,6 +21,16 @@ namespace _2DAG_Designer.Arduino
     */
     static class Communication
     {
+        // Bewegungsrichtung für den Brenner
+        public enum Direction
+        {
+            Left,
+            Right, 
+            Up,
+            Down,
+            Stop,
+        }
+
         public static bool IsConnected = false;
 
         //aktiver Port
@@ -130,6 +140,49 @@ namespace _2DAG_Designer.Arduino
             else
                 //Verbindung wird hergestellt
                 Connect();
+        }
+
+        /// <summary>
+        /// Brenner bewegen, um Startposition auszuwählen
+        /// </summary>
+        /// <param name="dir">Bewegungsrichtung</param>
+        /// <param name="start">Bewegung starten/stoppen</param>
+        public static void MoveBurner(Direction dir)
+        {
+            // Befehl an den Arduino
+            string sendMessage = "!MV";
+          
+            switch(dir)
+            {
+                case Direction.Up:
+                    {
+                        sendMessage += "U";
+                    }
+                    break;
+                case Direction.Down:
+                    {
+                        sendMessage += "D";
+                    }
+                    break;
+                case Direction.Left:
+                    {
+                        sendMessage += "L";
+                    }
+                    break;
+                case Direction.Right:
+                    {
+                        sendMessage += "R";
+                    }
+                    break;
+                case Direction.Stop:
+                    {
+                        sendMessage += "S";
+                    }
+                    break;
+            }
+
+            // Befehl wird gesendet
+            Send(sendMessage);
         }
 
         /// <summary>

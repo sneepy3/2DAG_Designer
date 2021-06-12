@@ -82,7 +82,12 @@ namespace _2DAG_Designer
             /// <summary>
             /// Linie zum Platzfreihalten zeichnen
             /// </summary>
-            DrawSpace
+            DrawSpace,
+
+            /// <summary>
+            /// Brenner wird bewegt, um die Startposition auszuwählen
+            /// </summary>
+            MoveBurner
         }
 
         #endregion
@@ -345,8 +350,17 @@ namespace _2DAG_Designer
             ChangeSelection(SelectedPointIndex += 1);
         }
 
+        #region Movebuttons click
+
         private void MoveTop_Click(object sender, RoutedEventArgs e)
         {
+            // Wenn der Brenner bewegt werden soll
+            if(drawMode == DrawMode.MoveBurner)
+            {
+                Arduino.Communication.MoveBurner(Communication.Direction.Up);
+                return;
+            }
+
             //um einen Millimeter verschieben
             Edit.EditDraw(DrawList[SelectedPointIndex], Edit.EditType.EndUp);
 
@@ -365,6 +379,13 @@ namespace _2DAG_Designer
 
         private void MoveLeft_Click(object sender, RoutedEventArgs e)
         {
+            // Wenn der Brenner bewegt werden soll
+            if (drawMode == DrawMode.MoveBurner)
+            {
+                Arduino.Communication.MoveBurner(Communication.Direction.Left);
+                return;
+            }
+
             //um einen Millimeter verschieben
             Edit.EditDraw(DrawList[SelectedPointIndex], Edit.EditType.EndLeft);
 
@@ -386,6 +407,13 @@ namespace _2DAG_Designer
 
         private void MoveRight_Click(object sender, RoutedEventArgs e)
         {
+            // Wenn der Brenner bewegt werden soll
+            if (drawMode == DrawMode.MoveBurner)
+            {
+                Arduino.Communication.MoveBurner(Communication.Direction.Right);
+                return;
+            }
+
             //um einen Millimeter verschieben
             Edit.EditDraw(DrawList[SelectedPointIndex], Edit.EditType.EndRight);
 
@@ -407,6 +435,13 @@ namespace _2DAG_Designer
 
         private void MoveBottom_Click(object sender, RoutedEventArgs e)
         {
+            // Wenn der Brenner bewegt werden soll
+            if (drawMode == DrawMode.MoveBurner)
+            {
+                Arduino.Communication.MoveBurner(Communication.Direction.Down);
+                return;
+            }
+
             //um einen Millimeter verschieben
             Edit.EditDraw(DrawList[SelectedPointIndex], Edit.EditType.EndDown);
 
@@ -425,6 +460,35 @@ namespace _2DAG_Designer
             var position = DrawList[SelectedPointIndex].GetEnd();
             SelectedPointBorder.Margin = new Thickness(position.X - 5, position.Y - 5, 0, 0);
         }
+
+        #endregion
+
+        #region Movebuttons release
+        private void MoveTop_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            // Bewegung wird gestoppt
+            Arduino.Communication.MoveBurner(Communication.Direction.Stop);
+        }
+
+        private void MoveLeft_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            // Bewegung wird gestoppt
+            Arduino.Communication.MoveBurner(Communication.Direction.Stop);
+        }
+
+        private void MoveRight_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            // Bewegung wird gestoppt
+            Arduino.Communication.MoveBurner(Communication.Direction.Stop);
+        }
+
+        private void MoveBottom_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            // Bewegung wird gestoppt
+            Arduino.Communication.MoveBurner(Communication.Direction.Stop);
+        }
+
+        #endregion
 
         #endregion
 
@@ -663,7 +727,7 @@ namespace _2DAG_Designer
             }
         }
 
-        #region Arduino
+        #region Arduino Menü
 
         private void ConnectComButton_Click(object sender, RoutedEventArgs e)
         {
@@ -675,11 +739,17 @@ namespace _2DAG_Designer
             {
                 //UploadButton wird sichtbar
                 ArduinoUploadButton.IsEnabled = true;
+
+                // MoveBurnerButton wird sichtbar
+                MoveBurnerButton.IsEnabled = true;
             }
             else
             {
                 //UploadButton wird unsichtbar
                 ArduinoUploadButton.IsEnabled = false;
+
+                // MoveBurnerButton wird unsichtbar
+                MoveBurnerButton.IsEnabled = false;
             }
         }
 
@@ -712,12 +782,26 @@ namespace _2DAG_Designer
             {
                 // bei gültiger Eingabe wird der Hintergrund weiß
                 SpeedTextBox.Background = Brushes.White;
+
+                // kann maximal 100 sein
+                if (burnSpeed > 100)
+                    burnSpeed = 100;
+
+                // minimal 1
+                else if (burnSpeed < 1)
+                    burnSpeed = 1;
             }
             else
             {
                 // Wenn die Eingabe keine Zahl ist, wird sie rot hinterlegt
                 SpeedTextBox.Background = Brushes.Red;
             }
+        }
+
+        private void MoveBurnerButton_Click(object sender, RoutedEventArgs e)
+        {
+            // der Brenner wird bewegt
+            drawMode = DrawMode.MoveBurner;
         }
 
         private void ArduinoUploadButton_Click(object sender, RoutedEventArgs e)
@@ -909,6 +993,11 @@ namespace _2DAG_Designer
                 case DrawMode.Move:
                     {
                         DrawModeLabel.Content = "Bewegen";
+                    }
+                    break;
+                case DrawMode.MoveBurner:
+                    {
+                        DrawModeLabel.Content = "Brenner bewegen (Pfeile)";
                     }
                     break;
             }
@@ -1568,7 +1657,6 @@ namespace _2DAG_Designer
                 }
             }
         }
-
 
         #endregion
         //-------------------------------------------------
