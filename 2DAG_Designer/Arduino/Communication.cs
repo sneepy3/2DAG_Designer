@@ -39,6 +39,9 @@ namespace _2DAG_Designer.Arduino
         //letzter vom Arduino gesendeter Befehl
         private static string _recievedCommand = "";
 
+        // gibt an, ob der Brenner gerade bewegt wird, um eine Startposition auszuwählen
+        public static bool MovingBurner = false;
+
         /// <summary>
         /// fügt verfügbare Ports zur Auswahl hinzu
         /// </summary>
@@ -157,26 +160,41 @@ namespace _2DAG_Designer.Arduino
                 case Direction.Up:
                     {
                         sendMessage += "U";
+
+                        // Brenner wird bewegt
+                        MovingBurner = true;
                     }
                     break;
                 case Direction.Down:
                     {
                         sendMessage += "D";
+
+                        // Brenner wird bewegt
+                        MovingBurner = true;
                     }
                     break;
                 case Direction.Left:
                     {
                         sendMessage += "L";
+
+                        // Brenner wird bewegt
+                        MovingBurner = true;
                     }
                     break;
                 case Direction.Right:
                     {
                         sendMessage += "R";
+
+                        // Brenner wird bewegt
+                        MovingBurner = true;
                     }
                     break;
                 case Direction.Stop:
                     {
                         sendMessage += "S";
+
+                        // Brenner wird nicht bewegt
+                        MovingBurner = false;
                     }
                     break;
             }

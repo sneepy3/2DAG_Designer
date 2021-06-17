@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
-using static _2DAG_Designer.Arduino.Communication;
 
 namespace _2DAG_Designer.Arduino.Engrave
 {
@@ -17,6 +16,8 @@ namespace _2DAG_Designer.Arduino.Engrave
     public static class Engrave
     {
         private static int _progress = 0;
+
+        public static int BurnSpeed = 50;
 
         public static int Progress
         {
@@ -38,10 +39,13 @@ namespace _2DAG_Designer.Arduino.Engrave
 
 
             //Der Eingraviervorgang beginnt
-            Send("!ENGRAVE");
+            Communication.Send("!ENGRAVE");
 
             //Anzahl der Objekte wird gesendet
-            Send($"#COUNT{drawables.Length - 1}");
+            Communication.Send($"#COUNT{drawables.Length - 1}");
+
+            // Brennergeschwindigkeit wird gesendet
+            Communication.Send($"#SPEED{BurnSpeed}");
 
             foreach (var drawable in drawables)
             {
@@ -49,7 +53,7 @@ namespace _2DAG_Designer.Arduino.Engrave
                 {
 
                     //Information der Linie wird gesendet
-                    Send(drawable.GetObjectInformation());                
+                    Communication.Send(drawable.GetObjectInformation());                
                 }
             }
 
@@ -65,8 +69,15 @@ namespace _2DAG_Designer.Arduino.Engrave
         /// </summary>
         public static void Start()
         {
+            // Wenn der Brenner gerade bewegt wird
+            if(Communication.MovingBurner)
+            {
+                // Bewegung wird gestoppt
+                Communication.MoveBurner(Communication.Direction.Stop);
+            }
+
             //Start Befehl wird gesendet
-            Send("!START");
+            Communication.Send("!START");
         }
 
         /// <summary>

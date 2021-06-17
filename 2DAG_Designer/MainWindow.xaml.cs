@@ -360,6 +360,11 @@ namespace _2DAG_Designer
                 Arduino.Communication.MoveBurner(Communication.Direction.Up);
                 return;
             }
+            // Wenn es keine Objekte gibt,
+            else if (DrawList.Count == 0)
+            {
+                return;
+            }
 
             //um einen Millimeter verschieben
             Edit.EditDraw(DrawList[SelectedPointIndex], Edit.EditType.EndUp);
@@ -383,6 +388,11 @@ namespace _2DAG_Designer
             if (drawMode == DrawMode.MoveBurner)
             {
                 Arduino.Communication.MoveBurner(Communication.Direction.Left);
+                return;
+            }
+            // Wenn es keine Objekte gibt,
+            else if (DrawList.Count == 0)
+            {
                 return;
             }
 
@@ -413,6 +423,11 @@ namespace _2DAG_Designer
                 Arduino.Communication.MoveBurner(Communication.Direction.Right);
                 return;
             }
+            // Wenn es keine Objekte gibt,
+            else if(DrawList.Count == 0)
+            {
+                return;
+            }
 
             //um einen Millimeter verschieben
             Edit.EditDraw(DrawList[SelectedPointIndex], Edit.EditType.EndRight);
@@ -439,6 +454,11 @@ namespace _2DAG_Designer
             if (drawMode == DrawMode.MoveBurner)
             {
                 Arduino.Communication.MoveBurner(Communication.Direction.Down);
+                return;
+            }
+            // Wenn es keine Objekte gibt,
+            else if (DrawList.Count == 0)
+            {
                 return;
             }
 
@@ -695,6 +715,9 @@ namespace _2DAG_Designer
 
                 Edit.EditObjectSize(Double.Parse(ChangeSizeTextBox.Text));
 
+                // Position der Auswahl wird aktualisiert
+                ChangeSelection(SelectedPointIndex);
+
                 ApplySizeChangeButton.BorderBrush = Brushes.Gray;
             }
             catch
@@ -773,29 +796,48 @@ namespace _2DAG_Designer
             }
         }
 
-        private void SpeedTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        private void SpeedTextBox_KeyDown(object sender, KeyEventArgs e)
         {
-            int burnSpeed;
-
-            // Wenn die Texteingabe eine Zahl ist,
-            if(int.TryParse(SpeedTextBox.Text, out burnSpeed))
+            // Wenn die Texteingabe mit enter akzeptiert wird, 
+            if(e.Key == Key.Enter)
             {
-                // bei gültiger Eingabe wird der Hintergrund weiß
-                SpeedTextBox.Background = Brushes.White;
+                int burnSpeed;
 
-                // kann maximal 100 sein
-                if (burnSpeed > 100)
-                    burnSpeed = 100;
+                // Wenn die Texteingabe eine Zahl ist,
+                if (int.TryParse(SpeedTextBox.Text, out burnSpeed))
+                {
+                    // bei gültiger Eingabe wird der Hintergrund weiß
+                    SpeedTextBox.Background = Brushes.White;
 
-                // minimal 1
-                else if (burnSpeed < 1)
-                    burnSpeed = 1;
+                    // kann maximal 100 sein
+                    if (burnSpeed > 100)
+                        burnSpeed = 100;
+
+                    // minimal 1
+                    else if (burnSpeed < 1)
+                        burnSpeed = 1;
+
+                    // Wert des Speedsliders wird aktualisiert
+                    SpeedSlider.Value = burnSpeed;
+                }
+                else
+                {
+                    // Wenn die Eingabe keine Zahl ist, wird sie rot hinterlegt
+                    SpeedTextBox.Background = Brushes.Red;
+                }
             }
-            else
-            {
-                // Wenn die Eingabe keine Zahl ist, wird sie rot hinterlegt
-                SpeedTextBox.Background = Brushes.Red;
-            }
+        }
+
+        private void SpeedSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            // Geschwindigkeit des Brenners 
+            int burnSpeed = (int)SpeedSlider.Value;
+
+            // Brennergeschwindigkeit wird abgespeichert 
+            Engrave.BurnSpeed = burnSpeed;
+
+            // Textbox wird aktualisiert
+            SpeedTextBox.Text = burnSpeed.ToString();
         }
 
         private void MoveBurnerButton_Click(object sender, RoutedEventArgs e)
@@ -1657,6 +1699,10 @@ namespace _2DAG_Designer
                 }
             }
         }
+
+
+
+
 
         #endregion
         //-------------------------------------------------

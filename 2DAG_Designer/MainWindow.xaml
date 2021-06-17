@@ -233,8 +233,10 @@
 
                         <StackPanel Orientation="Horizontal" >
                             <Label Content="Geschwindigkeit (in %):"></Label>
-                            <TextBox x:Name="SpeedTextBox" Text="10" TextChanged="SpeedTextBox_TextChanged" Width="30" TextAlignment="Center" VerticalContentAlignment="Center"></TextBox>
+                            <TextBox x:Name="SpeedTextBox" Width="30" KeyDown="SpeedTextBox_KeyDown" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"></TextBox>
                         </StackPanel>
+                        
+                        <Slider x:Name="SpeedSlider" Value="60" Minimum="1" Maximum="100" TickFrequency="1" ValueChanged="SpeedSlider_ValueChanged"></Slider>
 
                         <Button x:Name="MoveBurnerButton" Content="Brenner Bewegen" IsEnabled="False" Click="MoveBurnerButton_Click" Margin="0 10"></Button>
                         
@@ -265,7 +267,7 @@
                         <Button x:Name="PreviousPointButton" Content="vorgeriger" HorizontalAlignment="Left" VerticalAlignment="Top" Click="PreviousPointButton_Click" />
                         <Button x:Name="NextPointButton" Content="nächster" HorizontalAlignment="Right" VerticalAlignment="Top" Grid.Column="1" Click="NextPointButton_Click"/>
 
-                        <Button x:Name="MoveTop" Style="{StaticResource NoTriggerButtonStyle}"  Height="50" Width="50" Grid.Row="0" Grid.ColumnSpan="2"  Margin="10 10" Click="MoveTop_Click" MouseUp="MoveTop_MouseUp">
+                        <Button x:Name="MoveTop" Style="{StaticResource NoTriggerButtonStyle}"  Height="50" Width="50" Grid.Row="0" Grid.ColumnSpan="2"  Margin="10 10" PreviewMouseDown="MoveTop_Click" MouseUp="MoveTop_MouseUp">
                             <Button.Background>
                                 <ImageBrush ImageSource="Resources\arrow.png">
                                     <ImageBrush.RelativeTransform>
@@ -280,7 +282,7 @@
                             </Button.Background>
                         </Button>
 
-                        <Button x:Name="MoveLeft" Style="{StaticResource NoTriggerButtonStyle}" Height="50" Width="50" Grid.Row="1" Margin="10 10" Click="MoveLeft_Click" MouseUp="MoveLeft_MouseUp">
+                        <Button x:Name="MoveLeft" Style="{StaticResource NoTriggerButtonStyle}" Height="50" Width="50" Grid.Row="1" Margin="10 10" PreviewMouseDown="MoveLeft_Click" MouseUp="MoveLeft_MouseUp">
                             <Button.Background>
                                 <ImageBrush ImageSource="Resources\arrow.png">
                                     <ImageBrush.RelativeTransform>
@@ -295,13 +297,13 @@
                             </Button.Background>
                         </Button>
 
-                        <Button x:Name="MoveRight"  Height="50" Width="50" Style="{StaticResource NoTriggerButtonStyle}" Grid.Column="1" Grid.Row="1" Margin="10 10" Click="MoveRight_Click" MouseUp="MoveRight_MouseUp">
+                        <Button x:Name="MoveRight"  Height="50" Width="50" Style="{StaticResource NoTriggerButtonStyle}" Grid.Column="1" Grid.Row="1" Margin="10 10" PreviewMouseDown="MoveRight_Click" MouseUp="MoveRight_MouseUp">
                             <Button.Background>
                                 <ImageBrush ImageSource="Resources\arrow.png" />                            
                             </Button.Background>
                         </Button>
 
-                        <Button x:Name="MoveBottom" Height="50" Width="50" Style="{StaticResource NoTriggerButtonStyle}" Grid.Row="2" Grid.ColumnSpan="2" Margin="10 10" Click="MoveBottom_Click" MouseUp="MoveBottom_MouseUp">
+                        <Button x:Name="MoveBottom" Height="50" Width="50" Style="{StaticResource NoTriggerButtonStyle}" Grid.Row="2" Grid.ColumnSpan="2" Margin="10 10" PreviewMouseDown="MoveBottom_Click" MouseUp="MoveBottom_MouseUp">
                             <Button.Background>
                                 <ImageBrush ImageSource="Resources\arrow.png">
                                     <ImageBrush.RelativeTransform>
