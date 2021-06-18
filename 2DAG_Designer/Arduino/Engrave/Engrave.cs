@@ -17,8 +17,22 @@ namespace _2DAG_Designer.Arduino.Engrave
     {
         private static int _progress = 0;
 
-        public static int BurnSpeed = 50;
+        private static int _burnSpeed = 50;
+        public static int BurnSpeed
+        {
+            get { return _burnSpeed; }
+            set
+            {
+                _burnSpeed = value;
 
+                // Wenn ein Arduino verbunden ist,
+                if (Communication.IsConnected)
+                {
+                    // wird die aktualisierte Brennergeschwindigkeit gesendet
+                    Communication.Send($"#SPEED{_burnSpeed}");
+                }
+            }
+        }
         public static int Progress
         {
             get { return _progress; }
