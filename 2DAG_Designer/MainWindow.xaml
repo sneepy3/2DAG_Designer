@@ -267,7 +267,7 @@
                         <Button x:Name="PreviousPointButton" Content="vorgeriger" HorizontalAlignment="Left" VerticalAlignment="Top" Click="PreviousPointButton_Click" />
                         <Button x:Name="NextPointButton" Content="nächster" HorizontalAlignment="Right" VerticalAlignment="Top" Grid.Column="1" Click="NextPointButton_Click"/>
 
-                        <Button x:Name="MoveTop" Style="{StaticResource NoTriggerButtonStyle}"  Height="50" Width="50" Grid.Row="0" Grid.ColumnSpan="2"  Margin="10 10" PreviewMouseDown="MoveTop_Click" MouseUp="MoveTop_MouseUp">
+                        <Button x:Name="MoveTop" Style="{StaticResource NoTriggerButtonStyle}"  Height="50" Width="50" Grid.Row="0" Grid.ColumnSpan="2"  Margin="10 10" PreviewMouseDown="MoveTop_Click" PreviewMouseUp="MoveTop_MouseUp">
                             <Button.Background>
                                 <ImageBrush ImageSource="Resources\arrow.png">
                                     <ImageBrush.RelativeTransform>
@@ -282,7 +282,7 @@
                             </Button.Background>
                         </Button>
 
-                        <Button x:Name="MoveLeft" Style="{StaticResource NoTriggerButtonStyle}" Height="50" Width="50" Grid.Row="1" Margin="10 10" PreviewMouseDown="MoveLeft_Click" MouseUp="MoveLeft_MouseUp">
+                        <Button x:Name="MoveLeft" Style="{StaticResource NoTriggerButtonStyle}" Height="50" Width="50" Grid.Row="1" Margin="10 10" PreviewMouseDown="MoveLeft_Click" PreviewMouseUp="MoveLeft_MouseUp">
                             <Button.Background>
                                 <ImageBrush ImageSource="Resources\arrow.png">
                                     <ImageBrush.RelativeTransform>
@@ -297,13 +297,13 @@
                             </Button.Background>
                         </Button>
 
-                        <Button x:Name="MoveRight"  Height="50" Width="50" Style="{StaticResource NoTriggerButtonStyle}" Grid.Column="1" Grid.Row="1" Margin="10 10" PreviewMouseDown="MoveRight_Click" MouseUp="MoveRight_MouseUp">
+                        <Button x:Name="MoveRight"  Height="50" Width="50" Style="{StaticResource NoTriggerButtonStyle}" Grid.Column="1" Grid.Row="1" Margin="10 10" PreviewMouseDown="MoveRight_Click" PreviewMouseUp="MoveRight_MouseUp">
                             <Button.Background>
                                 <ImageBrush ImageSource="Resources\arrow.png" />                            
                             </Button.Background>
                         </Button>
 
-                        <Button x:Name="MoveBottom" Height="50" Width="50" Style="{StaticResource NoTriggerButtonStyle}" Grid.Row="2" Grid.ColumnSpan="2" Margin="10 10" PreviewMouseDown="MoveBottom_Click" MouseUp="MoveBottom_MouseUp">
+                        <Button x:Name="MoveBottom" Height="50" Width="50" Style="{StaticResource NoTriggerButtonStyle}" Grid.Row="2" Grid.ColumnSpan="2" Margin="10 10" PreviewMouseDown="MoveBottom_Click" PreviewMouseUp="MoveBottom_MouseUp">
                             <Button.Background>
                                 <ImageBrush ImageSource="Resources\arrow.png">
                                     <ImageBrush.RelativeTransform>

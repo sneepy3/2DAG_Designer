@@ -486,26 +486,32 @@ namespace _2DAG_Designer
         #region Movebuttons release
         private void MoveTop_MouseUp(object sender, MouseButtonEventArgs e)
         {
-            // Bewegung wird gestoppt
-            Arduino.Communication.MoveBurner(Communication.Direction.Stop);
+            if(drawMode == DrawMode.MoveBurner)
+            {
+                // Bewegung wird gestoppt
+                Arduino.Communication.MoveBurner(Communication.Direction.Stop);
+            }
         }
 
         private void MoveLeft_MouseUp(object sender, MouseButtonEventArgs e)
         {
-            // Bewegung wird gestoppt
-            Arduino.Communication.MoveBurner(Communication.Direction.Stop);
+            if (drawMode == DrawMode.MoveBurner)
+                // Bewegung wird gestoppt
+                Arduino.Communication.MoveBurner(Communication.Direction.Stop);
         }
 
         private void MoveRight_MouseUp(object sender, MouseButtonEventArgs e)
         {
-            // Bewegung wird gestoppt
-            Arduino.Communication.MoveBurner(Communication.Direction.Stop);
+            if (drawMode == DrawMode.MoveBurner)
+                // Bewegung wird gestoppt
+                Arduino.Communication.MoveBurner(Communication.Direction.Stop);
         }
 
         private void MoveBottom_MouseUp(object sender, MouseButtonEventArgs e)
         {
-            // Bewegung wird gestoppt
-            Arduino.Communication.MoveBurner(Communication.Direction.Stop);
+            if (drawMode == DrawMode.MoveBurner)
+                // Bewegung wird gestoppt
+                Arduino.Communication.MoveBurner(Communication.Direction.Stop);
         }
 
         #endregion
