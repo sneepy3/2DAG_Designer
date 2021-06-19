@@ -51,10 +51,6 @@ namespace _2DAG_Designer.Arduino.Engrave
             if (!Communication.IsConnected)
                 return;
 
-
-            //Der Eingraviervorgang beginnt
-            Communication.Send("!ENGRAVE");
-
             //Anzahl der Objekte wird gesendet
             Communication.Send($"#COUNT{drawables.Length - 1}");
 
