@@ -28,10 +28,10 @@ namespace _2DAG_Designer.DrawingObjects.Groups
             foreach (var letter in word)
             {
                 //Pfad der Buchstaben wird gespeichert
-                string filepath = Environment.CurrentDirectory;
+                string filepath = Environment.CurrentDirectory + @"\characters\";
 
                 //Ende weird entfernt (bin\Debug)
-                filepath = filepath.Remove(filepath.Length - 9, 9) + @"letters\";
+                //filepath = filepath.Remove(filepath.Length - 9, 9) + @"letters\";
 
                 //bei einem Leerzeichen
                 if (letter == ' ')
@@ -92,12 +92,12 @@ namespace _2DAG_Designer.DrawingObjects.Groups
             //index des ersten Objekts wird gespeichert
             var startIndex = MainWindow.DrawList.IndexOf(ContainingObjects.First());
 
-            //alle Objekte werden entfernt
-            MainWindow.DrawList.RemoveRange(startIndex, ContainingObjects.Count);
+            ////alle Objekte werden entfernt
+            //MainWindow.DrawList.RemoveRange(startIndex, ContainingObjects.Count);
 
 
-            //wird zur Liste hinzugefügt
-            MainWindow.DrawList.Add(this);
+            ////wird zur Liste hinzugefügt
+            //MainWindow.DrawList.Add(this);
         }
 
 

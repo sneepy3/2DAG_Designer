@@ -278,7 +278,7 @@ namespace _2DAG_Designer.DrawingObjects
                     break;
                 case ObjectTypes.Arc:
                     {
-                        var radius = double.Parse(informations.GetObjectInformation(ObjectInformation.radius));
+                        var radius = Double.Parse(informations.GetObjectInformation(ObjectInformation.radius));
 
                         var circleSizeAngle = double.Parse(informations.GetObjectInformation(ObjectInformation.circleSizeAngle));
                         
