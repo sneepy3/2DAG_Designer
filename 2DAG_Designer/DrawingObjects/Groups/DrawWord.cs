@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -28,21 +29,25 @@ namespace _2DAG_Designer.DrawingObjects.Groups
             foreach (var letter in word)
             {
                 //Pfad der Buchstaben wird gespeichert
-                string filepath = Environment.CurrentDirectory + @"\characters\";
-
-                //Ende weird entfernt (bin\Debug)
-                //filepath = filepath.Remove(filepath.Length - 9, 9) + @"letters\";
+                // Buchstaben befinden sich im characters ordner
+                string filepath = Path.Combine(
+                    Directory.GetParent(
+                        Directory.GetParent(
+                            Environment.CurrentDirectory)
+                        .ToString())
+                    .ToString(),
+                    "characters");
 
                 //bei einem Leerzeichen
                 if (letter == ' ')
                 {
                     //Datei wird dem Pfad hinzugefügt
-                    filepath += "_.txt";
+                    filepath += "\\" + "_.txt";
                 }
                 else
                 {
                     //Pfad befindet sich im letters ordner
-                    filepath += letter + ".txt";
+                    filepath += "\\" + letter + ".txt";
                 }
 
                 //Objekte des Buchstabens werden abgespeichert

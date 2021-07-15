@@ -1,0 +1,10 @@
+objectType:Ellipse/endX:4/endY:6/width:4/height:4/
+objectType:Line/endX:4/endY:4/lineMode:Normal/
+objectType:Line/endX:4,4/endY:4/lineMode:Normal/
+objectType:Arc/endX:4,4/endY:5/circleSizeAngle:180/startAngle:0/radius:37,16/inverted:False/
+objectType:Line/endX:4/endY:5/lineMode:Space/
+objectType:Line/endX:4,4/endY:5/lineMode:Normal/
+objectType:Arc/endX:4,4/endY:6/circleSizeAngle:180/startAngle:0/radius:37,16/inverted:False/
+objectType:Line/endX:4/endY:6/lineMode:Space/
+objectType:Line/endX:4,4/endY:6/lineMode:Normal/
+objectType:Line/endX:5/endY:6/lineMode:Space/
