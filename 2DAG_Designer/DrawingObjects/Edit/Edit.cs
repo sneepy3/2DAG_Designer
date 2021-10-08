@@ -76,6 +76,9 @@ namespace _2DAG_Designer.DrawingObjects.Edit
                 //Aktion wird der Aktionsliste hinzugefügt
                 MainWindow.ActionList.Add(MainWindow.ActionType.EditSize);
             }
+
+            // Maße werden aktualisiert
+            MainWindow.ThisWindow.Measure();
         }
 
         //Bearbeiten eines einzelnen IDrawable
@@ -101,6 +104,9 @@ namespace _2DAG_Designer.DrawingObjects.Edit
                     //objekt wird bearbeitet
                     drawGroup.Edit((DrawGroup.EditGroup)Enum.Parse(typeof(DrawGroup.EditGroup), editString));
                 }
+
+                // Maße werden aktualisiert
+                MainWindow.ThisWindow.Measure();
             }
             catch { }
         }
@@ -127,6 +133,9 @@ namespace _2DAG_Designer.DrawingObjects.Edit
                     //objekt wird bearbeitet
                     drawGroup.Edit((DrawGroup.EditGroup)Enum.Parse(typeof(DrawGroup.EditGroup), editString), value);
                 }
+
+                // Maße werden aktualisiert
+                MainWindow.ThisWindow.Measure();
             }
             catch { }
         }

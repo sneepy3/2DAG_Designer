@@ -208,11 +208,15 @@ namespace _2DAG_Designer.Arduino
         /// </summary>
         private static void dataRecieved(object sender, SerialDataReceivedEventArgs e)
         {
-            //Eingegangene Nachricht wird gespeichert
-            var data = _serialPort.ReadLine();
+            try
+            {   
+                //Eingegangene Nachricht wird gespeichert
+                var data = _serialPort.ReadLine();
 
-            //Eingegangene Nachricht wird behandelt
-            handleIncomingMessage(data);
+                //Eingegangene Nachricht wird behandelt
+                handleIncomingMessage(data);
+            }
+            catch { }
         }
 
 

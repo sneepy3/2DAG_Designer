@@ -1,4 +1,0 @@
-objectType:Ellipse/endX:6/endY:8/width:4/height:4/color:#FF000000/
-objectType:Line/endX:6,625/endY:8/color:#FF2F4F4F/
-objectType:Arc/endX:6,625/endY:7/color:#FF000000/angle:270/width:39,6666666666667/height:24,7916666666667/keepHeight:True/inverted:True/
-objectType:Line/endX:6,875/endY:8/color:#FF2F4F4F/

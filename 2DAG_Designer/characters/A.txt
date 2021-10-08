@@ -1,0 +1,7 @@
+objectType:Ellipse/endX:3/endY:6/width:4/height:4/
+objectType:Line/endX:3,8/endY:4/lineMode:Normal/
+objectType:Line/endX:4,2/endY:5/lineMode:Normal/
+objectType:Line/endX:3,4/endY:5/lineMode:Space/
+objectType:Line/endX:4,2/endY:5/lineMode:Normal/
+objectType:Line/endX:4,6/endY:6/lineMode:Normal/
+objectType:Line/endX:4,8/endY:6/lineMode:Space/

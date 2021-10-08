@@ -743,7 +743,7 @@ namespace _2DAG_Designer
                 //neues Wort wird erstellt, mit dem eingegebenen Text
                 var word = new DrawWord(DrawList.Last().GetEnd(), DrawLettersTextBox.Text);
 
-                Draw(word, -1);
+                Draw(word, SelectedPointIndex + 1); 
 
                 //Zeichenaktion wird hinzugefügt
                 ActionList.Add(ActionType.Draw);
@@ -1062,6 +1062,11 @@ namespace _2DAG_Designer
 
         #region drawing
 
+        /// <summary>
+        /// Zeichnet ein IDrawable an den angegebenen Index der Drawlist, -1 für anhängen
+        /// </summary>
+        /// <param name="newDrawObject"></param>
+        /// <param name="index"></param>
         public void Draw(IDrawable newDrawObject, int index)
         {
             // Wenn das Objekt der Liste angehängt werden soll,
@@ -1426,21 +1431,24 @@ namespace _2DAG_Designer
             // Markierung in den Vordergrund
             DrawField.Children.Remove(SelectedPointBorder);
             DrawField.Children.Add(SelectedPointBorder);
+
+            // Maße werden aktualisiert
+            MainWindow.ThisWindow.Measure();
         }
 
         /// <summary>
-        /// Zeigt Maße an
+        /// Zeigt Maße des Ausgewählten Objekts an
         /// </summary>
         public void Measure()
         {
             try
             {
                 //Breite und Höhe werden in von Pixel in cm umgerechnet
-                double width = PixelToCentimeter(DrawList.Last().Width);
-                double height = PixelToCentimeter(DrawList.Last().Height);
+                double width = PixelToCentimeter(DrawList[SelectedPointIndex].Width);
+                double height = PixelToCentimeter(DrawList[SelectedPointIndex].Height);
 
                 // Winkel wird auf 2 Nachkommastellen gerundet
-                double angle = Math.Round(DrawList.Last().Angle, 2);
+                double angle = Math.Round(DrawList[SelectedPointIndex].Angle, 2);
 
                 if (angle == 360)
                     angle = 0;
@@ -1462,7 +1470,7 @@ namespace _2DAG_Designer
                     AngleLabel.Content = "Winkel: " + angle + "°";
 
                     //Bei einer Linie wird der Winkel in Klammern angezeigt, da er hier nich so wichtig sit
-                    if (DrawList.Last().GetType() == typeof(DrawLine))
+                    if (DrawList[SelectedPointIndex].GetType() == typeof(DrawLine))
                     {
                         AngleLabel.Content = "(" + AngleLabel.Content + ")";
                     }
