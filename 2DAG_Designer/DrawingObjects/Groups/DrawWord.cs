@@ -93,11 +93,11 @@ namespace _2DAG_Designer.DrawingObjects.Groups
             var startIndex = MainWindow.DrawList.IndexOf(ContainingObjects.First());
 
             //alle Objekte werden entfernt
-            MainWindow.DrawList.RemoveRange(startIndex, ContainingObjects.Count);
+            //MainWindow.DrawList.RemoveRange(startIndex, ContainingObjects.Count);
 
 
             //wird zur Liste hinzugefügt
-            MainWindow.DrawList.Add(this);
+            //MainWindow.DrawList.Add(this);
         }
 
 

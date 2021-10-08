@@ -741,7 +741,9 @@ namespace _2DAG_Designer
             try
             {
                 //neues Wort wird erstellt, mit dem eingegebenen Text
-                new DrawWord(DrawList.Last().GetEnd(), DrawLettersTextBox.Text);
+                var word = new DrawWord(DrawList.Last().GetEnd(), DrawLettersTextBox.Text);
+
+                Draw(word, -1);
 
                 //Zeichenaktion wird hinzugefügt
                 ActionList.Add(ActionType.Draw);
