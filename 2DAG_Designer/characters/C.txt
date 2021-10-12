@@ -1,0 +1,4 @@
+objectType:Ellipse/endX:5/endY:7/width:4/height:4/
+objectType:Line/endX:6/endY:5/lineMode:Space/
+objectType:Arc/endX:6/endY:7/circleSizeAngle:180/startAngle:180/radius:1/inverted:True/
+objectType:Line/endX:6,2/endY:7/lineMode:Space/

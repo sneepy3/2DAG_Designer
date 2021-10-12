@@ -556,7 +556,7 @@ namespace _2DAG_Designer
                 // Ausgewähltes Objekt wird zur Mausposition bewegt
                 DrawList[SelectedPointIndex].SetEnd(mousePosition);
                 //Endpunkt wird gerundet
-                DrawList[SelectedPointIndex].Round();
+                DrawList[SelectedPointIndex].SetEnd(RoundPointToGrid(DrawList[SelectedPointIndex].GetEnd()));
                 DrawList[SelectedPointIndex].Redraw();
 
 
@@ -577,10 +577,10 @@ namespace _2DAG_Designer
                 if (FirstDraw)
                 {
                     // wird der erste Startpunkt festgelegt
-                    var startPosition = Mouse.GetPosition(DrawArea); //Mausposition im Bezug auf DrawArea wird abgefragt
+                    var startPosition = RoundPointToGrid(Mouse.GetPosition(DrawArea)); //Mausposition im Bezug auf DrawArea wird abgefragt
 
                     // es ein Punkt erstellt
-                    var newPoint = new DrawEllipse(startPosition, 4, 4, true);
+                    var newPoint = new DrawEllipse(startPosition, 4, 4);
 
                     // Punkt wird gezeichnet
                     Draw(newPoint, -1);
@@ -596,8 +596,11 @@ namespace _2DAG_Designer
                     //der Start für das neue Objekt, ist das ende des letzten Objekts
                     var newObjectStart = DrawList.Last().GetEnd();
 
-                    //Endposition ist der Mausklick
-                    var newObjectEnd = Mouse.GetPosition(DrawArea); //Mausposition im Bezug auf DrawArea wird abgefragt
+                    // Endposition ist der Mausklick
+                    // Endpunkt wird gerundet
+                    var newObjectEnd = RoundPointToGrid(Mouse.GetPosition(DrawArea)); //Mausposition im Bezug auf DrawArea wird abgefragt
+
+                    
 
                     // Index des neuen Objekts in der DrawList
                     // -1 für anhängen an die Liste
@@ -619,7 +622,7 @@ namespace _2DAG_Designer
                         if (drawMode == DrawMode.DrawSpace)
                             lineMode = DrawLine.LineMode.Space;
 
-                        var newLine = new DrawLine(newObjectStart, newObjectEnd, lineMode, true);
+                        var newLine = new DrawLine(newObjectStart, newObjectEnd, lineMode);
 
                         // die Linie wird gezeichnet in schwarz
                         Draw(newLine, index);
@@ -1515,6 +1518,20 @@ namespace _2DAG_Designer
         public static double CentimeterTopixel(double value)
         {
             return value * (DrawRowSize / 15);
+        }
+
+        public static Point RoundPointToGrid(Point p)
+        {
+            //teilt die Grid in 30 Teile ein und rundet auf eine Ganzzahl
+            int xRound = (int)Math.Round(p.X / (DrawRowSize / 30));
+            int yRound = (int)Math.Round(p.Y / (DrawRowSize / 30));
+
+            // 
+            p.X = xRound * (DrawRowSize / 30);
+            p.Y = yRound * (DrawRowSize / 30);
+
+            // gerundeter Punkt wird zurückgegeben
+            return p;
         }
 
         /// <summary>

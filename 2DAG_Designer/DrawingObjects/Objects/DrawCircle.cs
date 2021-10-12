@@ -70,6 +70,7 @@ namespace _2DAG_Designer.DrawingObjects.Objects
 
             #endregion
 
+
             //Winkel wird berechnet 
             GetAngle();
 
@@ -367,7 +368,7 @@ namespace _2DAG_Designer.DrawingObjects.Objects
             line[0] += ObjectInformation.startAngle.InformationToString(StartAngle);
 
             // Radius
-            line[0] += ObjectInformation.radius.InformationToString(Radius);
+            line[0] += ObjectInformation.radius.InformationToString(MainWindow.PixelToCentimeter(Radius));
 
             // Invertierung
             line[0] += ObjectInformation.inverted.InformationToString(IsInverted);

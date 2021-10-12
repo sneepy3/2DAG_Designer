@@ -38,15 +38,11 @@ namespace _2DAG_Designer.DrawingObjects.Objects
 
         #region Constructor
 
-        public DrawLine (Point startPoint, Point endPoint, LineMode mode, bool roundEnd)
+        public DrawLine (Point startPoint, Point endPoint, LineMode mode)
         {
             //Start und Endpunkt des neuen Objekts wird festgelegt
             this.ObjectStart = startPoint;
             this.ActualObjectEnd = endPoint;
-
-            //Runden wenn gerundet werden soll
-            if (roundEnd)
-                Round();
 
             //berechnet Maße
             GetMeasures();

@@ -55,16 +55,6 @@ namespace _2DAG_Designer.DrawingObjects
         /// </summary>
         public abstract void Redraw();
 
-        public void Round()
-        {
-            //teilt die Grid in 30 Teile ein und rundet auf eine Ganzzahl
-            int xRound = (int)Math.Round((GroupEnd.X / (MainWindow.DrawRowSize / 30)));
-            int yRound = (int)Math.Round((GroupEnd.Y / (MainWindow.DrawRowSize / 30)));
-
-            GroupEnd.X = xRound * (MainWindow.DrawRowSize / 30);
-            GroupEnd.Y = yRound * (MainWindow.DrawRowSize / 30);
-        }
-
         public void Remove()
         {
             //jedes Objekt wird entfernt

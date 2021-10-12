@@ -61,20 +61,6 @@ namespace _2DAG_Designer.DrawingObjects
         #region Helper
 
         /// <summary>
-        /// rundet in 0,5 cm Schritten
-        /// </summary>
-        public void Round()
-        {
-            //teilt die Grid in 30 Teile ein und rundet auf eine Ganzzahl
-            int xRound = (int)Math.Round((ActualObjectEnd.X / (MainWindow.DrawRowSize / 30)));
-            int yRound = (int)Math.Round((ActualObjectEnd.Y / (MainWindow.DrawRowSize / 30)));
-
-            // 
-            ActualObjectEnd.X = xRound * (MainWindow.DrawRowSize / 30);
-            ActualObjectEnd.Y = yRound * (MainWindow.DrawRowSize / 30);
-        }
-
-        /// <summary>
         /// zeichnet das Objekt erneut
         /// </summary>
         public abstract void Redraw();
@@ -262,7 +248,7 @@ namespace _2DAG_Designer.DrawingObjects
                         var lineMode = (DrawLine.LineMode)Enum.Parse(typeof(DrawLine.LineMode), informations.GetObjectInformation(ObjectInformation.lineMode));
 
                         //ende des letzen Objekts ist der Start der Linie
-                        newObject = new DrawLine(lastEndPoint, endPoint, lineMode, false);
+                        newObject = new DrawLine(lastEndPoint, endPoint, lineMode);
                     }
                     break;
                 case ObjectTypes.Ellipse:
@@ -273,12 +259,12 @@ namespace _2DAG_Designer.DrawingObjects
                         //Höhe
                         var height = double.Parse(informations.GetObjectInformation(ObjectInformation.height));
 
-                        newObject = new DrawEllipse(endPoint, width, height, false);
+                        newObject = new DrawEllipse(endPoint, width, height);
                     }
                     break;
                 case ObjectTypes.Arc:
                     {
-                        var radius = Double.Parse(informations.GetObjectInformation(ObjectInformation.radius));
+                        var radius = MainWindow.CentimeterTopixel(Double.Parse(informations.GetObjectInformation(ObjectInformation.radius)));
 
                         var circleSizeAngle = double.Parse(informations.GetObjectInformation(ObjectInformation.circleSizeAngle));
                         

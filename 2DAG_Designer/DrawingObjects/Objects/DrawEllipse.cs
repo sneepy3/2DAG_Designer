@@ -23,14 +23,10 @@ namespace _2DAG_Designer.DrawingObjects.Objects
         /// <summary>
         /// Constructor
         /// </summary>
-        public DrawEllipse (Point position, double width, double height, bool roundEnd)
+        public DrawEllipse (Point position, double width, double height)
         {
             //Werte werden festgelegt
             this.ActualObjectEnd = position;
-
-            //Runden wenn gerundet werden soll
-            if (roundEnd)
-                Round();
 
             this.ObjectStart = ActualObjectEnd;
 

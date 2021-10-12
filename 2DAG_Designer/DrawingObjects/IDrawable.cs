@@ -21,11 +21,6 @@ namespace _2DAG_Designer.DrawingObjects
         void Redraw();
 
         /// <summary>
-        /// Endpunkt wird gerundet (auf 5 mm)
-        /// </summary>
-        void Round();
-
-        /// <summary>
         /// entfernen aus dem DrawField
         /// </summary>
         void Remove();
